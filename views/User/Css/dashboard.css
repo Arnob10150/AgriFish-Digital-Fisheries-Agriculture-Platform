@@ -1,0 +1,192 @@
+/* Dashboard-specific styles - extends main style.css */
+
+/* Enhanced sidebar animations */
+.sidebar {
+    transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed {
+    transform: translateX(-100%);
+}
+
+/* Dashboard card hover effects */
+.stat-card, .product-card, .sensor-card {
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover, .sensor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Product card enhanced interactions */
+.product-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.product-card:hover::before {
+    left: 100%;
+}
+
+/* Table enhancements */
+.data-table {
+    position: relative;
+}
+
+.data-table::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #e2e8f0, #3b82f6, #e2e8f0);
+}
+
+/* Button animations */
+.btn-primary, .btn-outline, .add-cart-btn, .assistant-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before, .btn-outline::before, .add-cart-btn::before, .assistant-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:active::before, .btn-outline:active::before, .add-cart-btn:active::before, .assistant-btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 1024px) {
+    .sidebar {
+        position: fixed;
+        z-index: 1000;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding-top: 4rem;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1001;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+    }
+}
+
+@media (max-width: 640px) {
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .search-wrapper {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid, .sensor-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .categories {
+        justify-content: center;
+    }
+}
+
+/* Dark mode support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+    .stat-card, .product-card, .sensor-card, .data-table {
+        background: #1f2937;
+        border-color: #374151;
+        color: #f9fafb;
+    }
+
+    .stat-title, .sensor-title, .table-title {
+        color: #d1d5db;
+    }
+}
+
+/* Print styles */
+@media print {
+    .sidebar, .header-actions, .add-cart-btn {
+        display: none !important;
+    }
+
+    .main-content {
+        margin: 0 !important;
+    }
+
+    .product-card, .stat-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

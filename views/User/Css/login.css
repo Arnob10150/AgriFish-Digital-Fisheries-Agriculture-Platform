@@ -1,0 +1,117 @@
+/* Login-specific styles - extends main style.css */
+
+/* Additional login form enhancements */
+.auth-form .form-input {
+    font-size: 1rem;
+    padding: 0.875rem 1rem;
+}
+
+.auth-form .form-input:focus {
+    transform: scale(1.02);
+    transition: transform 0.2s ease;
+}
+
+/* Language selector styling */
+.language-selector {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+}
+
+.language-selector select {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #1e293b;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    backdrop-filter: blur(10px);
+}
+
+/* Demo modal enhancements */
+.demo-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.demo-modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+.demo-modal h3 {
+    margin-bottom: 1rem;
+    color: #1e293b;
+}
+
+.demo-numbers {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.demo-item {
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #e2e8f0;
+}
+
+.demo-item:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.demo-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #64748b;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+    .auth-container {
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+
+    .hero-section {
+        padding: 2rem 1rem;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+}

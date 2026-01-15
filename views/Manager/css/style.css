@@ -1,0 +1,51 @@
+
+        body {
+    font-family: Arial, Helvetica, sans-serif;
+    background:aliceblue ;
+    margin: 0;
+}
+header{
+    background: skyblue;
+    padding: 15px;
+    color: white;
+    text-align: center;
+
+}
+.wlc{
+    text-align: center;
+    margin: 20px;
+    font-size: 1.2em;
+
+}
+.feature{
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    border-radius: 8px;
+    padding :20px;
+    box-shadow: 0 2px 6px black;
+
+}
+.feature h2{
+    text-align: center;
+    margin-bottom: 15px;
+}
+ul{
+    list-style: none;
+    padding: 0;
+    margin: 12 px 0;
+
+}
+li{
+    margin: 12px 0;
+}
+ ul li a {
+    display: block;
+    padding: 12px;
+    background:peachpuff ;
+    color: blue;
+    text-decoration: none;
+    border-radius: 6px;
+   
+    
+ }

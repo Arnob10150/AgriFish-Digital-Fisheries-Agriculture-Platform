@@ -1,0 +1,52 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f9;
+}
+.reorder-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 25px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+h1 {
+    text-align: center;
+    color: #333;
+}
+.message {
+    text-align: center;
+    margin: 10px 0;
+    font-weight: bold;
+    color: green;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+table th {
+    background-color: #007bff;
+    color: white;
+}
+input[type="number"] {
+    width: 70px;
+    padding: 5px;
+    text-align: center;
+}
+.update-btn {
+    padding: 6px 12px;
+    background-color: #28a745;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+.update-btn:hover {
+    background-color: #218838;
+}
