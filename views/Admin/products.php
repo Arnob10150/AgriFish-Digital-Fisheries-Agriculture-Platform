@@ -59,9 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 try {
     require_once '../../models/Product.php';
     $productModel = new Product();
-    $products = $productModel->getAllActive();
+    $products = $productModel->getAllProductsForAdmin();
+    $pendingProducts = $productModel->getPendingProducts();
 } catch (Exception $e) {
     $products = [];
+    $pendingProducts = [];
 }
 ?>
 <!DOCTYPE html>
@@ -72,6 +74,7 @@ try {
     <title>Product Management - DFAP</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
+      <script src="js/script.js" defer></script>
 </head>
 <body>
 
@@ -104,7 +107,6 @@ try {
 
         <?php echo $message; ?>
 
-->
         <div class="data-table">
             <div class="table-header">
                 <h2 class="table-title">All Products (<?php echo count($products); ?>)</h2>
@@ -119,7 +121,7 @@ try {
                             <th>Category</th>
                             <th>Price</th>
                             <th>Stock</th>
-                            <th>Status</th>
+                            <th>Approval Status</th>
                             <th class="text-right">Actions</th>
                         </tr>
                     </thead>
@@ -138,13 +140,21 @@ try {
                             <td><?php echo htmlspecialchars($product['category']); ?></td>
                             <td>৳<?php echo number_format($product['price'], 0); ?></td>
                             <td><?php echo $product['stock_quantity'] ?? 0; ?> <?php echo htmlspecialchars($product['unit'] ?? 'kg'); ?></td>
-                            <td><span class="status-badge">Active</span></td>
+                            <td>
+                                <span class="status-badge <?php
+                                    $status = $product['approval_status'] ?? 'pending';
+                                    echo $status === 'approved' ? 'approved' : ($status === 'pending' ? 'pending' : 'rejected');
+                                ?>" onclick="showStatusMenu(<?php echo $product['product_id']; ?>, '<?php echo $status; ?>')">
+                                    <?php echo ucfirst($status); ?> ▼
+                                </span>
+                                <div id="status-menu-<?php echo $product['product_id']; ?>" class="status-menu" style="display: none;">
+                                    <button onclick="changeStatus(<?php echo $product['product_id']; ?>, 'approved')">✅ Approve</button>
+                                    <button onclick="changeStatus(<?php echo $product['product_id']; ?>, 'rejected')">❌ Reject</button>
+                                </div>
+                            </td>
                             <td class="text-right">
-                                <button class="btn-outline" onclick="editProduct(<?php echo $product['product_id']; ?>)">Edit</button>
-                                <form method="post" style="display:inline;">
-                                    <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
-                                    <button type="submit" name="delete_product" class="btn-outline" onclick="return confirm('Delete this product?')">Delete</button>
-                                </form>
+                                <button class="btn-outline" onclick="editProduct(this)" data-id="<?php echo $product['product_id']; ?>" data-name="<?php echo htmlspecialchars($product['name']); ?>" data-description="<?php echo htmlspecialchars($product['description'] ?? ''); ?>" data-price="<?php echo $product['price']; ?>" data-category="<?php echo $product['category']; ?>" data-image="<?php echo htmlspecialchars($product['image']); ?>" data-stock="<?php echo $product['stock_quantity'] ?? 0; ?>" data-unit="<?php echo htmlspecialchars($product['unit'] ?? 'kg'); ?>">Edit</button>
+                                <button class="btn-outline" onclick="deleteProduct(<?php echo $product['product_id']; ?>)">Delete</button>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -153,6 +163,53 @@ try {
             </div>
         </div>
     </div>
+
+    <?php if (!empty($pendingProducts)): ?>
+    <div class="data-table">
+        <div class="table-header">
+            <h2 class="table-title">Pending Product Approvals (<?php echo count($pendingProducts); ?>)</h2>
+        </div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Seller</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($pendingProducts as $product): ?>
+                    <tr>
+                        <td><?php echo $product['product_id']; ?></td>
+                        <td>
+                            <img src="<?php echo htmlspecialchars($product['image']); ?>"
+                                 alt="Product"
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                            <span style="display: none;"><?php echo $product['image'] ?? '🐟'; ?></span>
+                        </td>
+                        <td><?php echo htmlspecialchars($product['name']); ?></td>
+                        <td><?php echo htmlspecialchars($product['seller_name']); ?></td>
+                        <td><?php echo htmlspecialchars($product['category']); ?></td>
+                        <td>৳<?php echo number_format($product['price'], 0); ?></td>
+                        <td><?php echo $product['stock_quantity'] ?? 0; ?> <?php echo htmlspecialchars($product['unit'] ?? 'kg'); ?></td>
+                        <td class="text-right">
+                            <button class="btn-primary" onclick="approveProduct(<?php echo $product['product_id']; ?>)">Approve</button>
+                            <button class="btn-outline" onclick="rejectProduct(<?php echo $product['product_id']; ?>)">Reject</button>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php endif; ?>
 
 
     <div id="productModal" class="modal" style="display: none;">
@@ -217,12 +274,43 @@ try {
             document.getElementById('productModal').style.display = 'block';
         }
 
-        function editProduct(id) {
+        function editProduct(button) {
+            const data = button.dataset;
 
             document.getElementById('modalTitle').textContent = 'Edit Product';
+            document.getElementById('product_id').value = data.id;
+            document.getElementById('name').value = data.name;
+            document.getElementById('description').value = data.description || '';
+            document.getElementById('price').value = data.price;
+            document.getElementById('category').value = data.category;
+            document.getElementById('image').value = data.image;
+            document.getElementById('stock_quantity').value = data.stock;
+            document.getElementById('unit').value = data.unit;
             document.getElementById('submitBtn').name = 'update_product';
             document.getElementById('submitBtn').textContent = 'Update Product';
             document.getElementById('productModal').style.display = 'block';
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.style.display = 'none';
+
+                const inputId = document.createElement('input');
+                inputId.type = 'hidden';
+                inputId.name = 'product_id';
+                inputId.value = id;
+
+                const inputDelete = document.createElement('input');
+                inputDelete.type = 'hidden';
+                inputDelete.name = 'delete_product';
+
+                form.appendChild(inputId);
+                form.appendChild(inputDelete);
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
 
         function closeModal() {

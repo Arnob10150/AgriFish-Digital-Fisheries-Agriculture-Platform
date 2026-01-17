@@ -4,7 +4,5 @@ $username = "root";
 $password = "";
 $database = "dfap_db";
 $conn = new mysqli($servername, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// Removed die() to allow graceful handling of connection errors
 ?>

@@ -1,121 +1,185 @@
 <?php
 
+require_once 'database.php';
+
 class Product {
-    private $conn;
+    private $pdo;
 
     public function __construct() {
         try {
-            include_once 'db_connect.php';
-            global $conn;
-            if ($conn && !$conn->connect_error) {
-                $this->conn = $conn;
-            } else {
-                $this->conn = null;
-            }
+            $this->pdo = getDB();
         } catch (Exception $e) {
-            $this->conn = null;
+            $this->pdo = null;
         }
     }
 
 
     public function getAllActive() {
-        if (!$this->conn) {
+        if (!$this->pdo) {
             return $this->getDemoProducts();
         }
 
-        $sql = "SELECT * FROM products WHERE is_active = 1 ORDER BY created_at DESC";
-        $result = $this->conn->query($sql);
-
-        $products = [];
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $products[] = $row;
-            }
+        try {
+            $stmt = $this->pdo->query("SELECT * FROM products WHERE is_active = 1 AND approval_status = 'approved' ORDER BY created_at DESC");
+            $products = $stmt->fetchAll();
+            return empty($products) ? $this->getDemoProducts() : $products;
+        } catch (PDOException $e) {
+            return $this->getDemoProducts();
         }
-
-        return empty($products) ? $this->getDemoProducts() : $products;
     }
 
 
     public function getById($id) {
-        $stmt = $this->conn->prepare("SELECT * FROM products WHERE product_id = ? AND is_active = 1");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        if (!$this->pdo) return null;
+
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM products WHERE product_id = ? AND is_active = 1");
+            $stmt->execute([$id]);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            return null;
+        }
     }
 
 
     public function getByCategory($category) {
-        $stmt = $this->conn->prepare("SELECT * FROM products WHERE category = ? AND is_active = 1 ORDER BY created_at DESC");
-        $stmt->bind_param("s", $category);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        if (!$this->pdo) return [];
 
-        $products = [];
-        while ($row = $result->fetch_assoc()) {
-            $products[] = $row;
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM products WHERE category = ? AND is_active = 1 ORDER BY created_at DESC");
+            $stmt->execute([$category]);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
         }
-        return $products;
     }
 
   
     public function create($data) {
-        if (!$this->conn) return false;
+        if (!$this->pdo) return false;
 
-        $stmt = $this->conn->prepare("INSERT INTO products (name, description, price, category, image, stock_quantity, unit, seller_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssdssiss",
-            $data['name'],
-            $data['description'],
-            $data['price'],
-            $data['category'],
-            $data['image'],
-            $data['stock_quantity'],
-            $data['unit'],
-            $data['seller_id']
-        );
-        return $stmt->execute();
+        try {
+            $stmt = $this->pdo->prepare("INSERT INTO products (name, description, price, category, image, stock_quantity, unit, seller_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $data['name'],
+                $data['description'],
+                $data['price'],
+                $data['category'],
+                $data['image'],
+                $data['stock_quantity'],
+                $data['unit'],
+                $data['seller_id']
+            ]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
 
     public function update($id, $data) {
-        if (!$this->conn) return false;
+        if (!$this->pdo) return false;
 
-        $stmt = $this->conn->prepare("UPDATE products SET name=?, description=?, price=?, category=?, image=?, stock_quantity=?, unit=? WHERE product_id=?");
-        $stmt->bind_param("ssdssisi",
-            $data['name'],
-            $data['description'],
-            $data['price'],
-            $data['category'],
-            $data['image'],
-            $data['stock_quantity'],
-            $data['unit'],
-            $id
-        );
-        return $stmt->execute();
+        try {
+            $stmt = $this->pdo->prepare("UPDATE products SET name=?, description=?, price=?, category=?, image=?, stock_quantity=?, unit=? WHERE product_id=?");
+            $stmt->execute([
+                $data['name'],
+                $data['description'],
+                $data['price'],
+                $data['category'],
+                $data['image'],
+                $data['stock_quantity'],
+                $data['unit'],
+                $id
+            ]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function delete($id) {
-        if (!$this->conn) return false;
+        if (!$this->pdo) return false;
 
-        $stmt = $this->conn->prepare("UPDATE products SET is_active = 0 WHERE product_id = ?");
-        $stmt->bind_param("i", $id);
-        return $stmt->execute();
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM products WHERE product_id = ?");
+            $stmt->execute([$id]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public function approveProduct($id) {
+        if (!$this->pdo) return false;
+
+        try {
+            $stmt = $this->pdo->prepare("UPDATE products SET approval_status = 'approved' WHERE product_id = ?");
+            $stmt->execute([$id]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public function rejectProduct($id) {
+        if (!$this->pdo) return false;
+
+        try {
+            $stmt = $this->pdo->prepare("UPDATE products SET approval_status = 'rejected' WHERE product_id = ?");
+            $stmt->execute([$id]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public function getPendingProducts() {
+        if (!$this->pdo) return [];
+
+        try {
+            $stmt = $this->pdo->query("SELECT p.*, u.full_name as seller_name FROM products p JOIN users u ON p.seller_id = u.user_id WHERE p.approval_status = 'pending' ORDER BY p.created_at DESC");
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function getAllProductsForAdmin() {
+        if (!$this->pdo) return [];
+
+        try {
+            $stmt = $this->pdo->query("SELECT * FROM products WHERE is_active = 1 ORDER BY created_at DESC");
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function getBySeller($sellerId) {
+        if (!$this->pdo) return [];
+
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM products WHERE seller_id = ? ORDER BY created_at DESC");
+            $stmt->execute([$sellerId]);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 
 
     public function search($query) {
-        $searchTerm = "%$query%";
-        $stmt = $this->conn->prepare("SELECT * FROM products WHERE (name LIKE ? OR description LIKE ?) AND is_active = 1 ORDER BY created_at DESC");
-        $stmt->bind_param("ss", $searchTerm, $searchTerm);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        if (!$this->pdo) return [];
 
-        $products = [];
-        while ($row = $result->fetch_assoc()) {
-            $products[] = $row;
+        try {
+            $searchTerm = "%$query%";
+            $stmt = $this->pdo->prepare("SELECT * FROM products WHERE (name LIKE ? OR description LIKE ?) AND is_active = 1 ORDER BY created_at DESC");
+            $stmt->execute([$searchTerm, $searchTerm]);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
         }
-        return $products;
     }
 
 

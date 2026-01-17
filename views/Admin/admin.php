@@ -23,6 +23,7 @@
     <title>Admin Console - DFAP</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <script src="Script.js"></script>
 </head>
 <body>
 
@@ -43,6 +44,8 @@
 
 
     <div class="main-content">
+        <div id="message" class="alert" style="display: none; margin-bottom: 1rem;"></div>
+
         <div class="dashboard-header">
             <div>
                 <h1 class="dashboard-title">Admin Console</h1>
@@ -50,7 +53,6 @@
             </div>
             <div class="status-badge">System Healthy</div>
         </div>
-
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -105,7 +107,7 @@
                                 <td>
                                     <div style="display: flex; align-items: center;">
                                         <div class="user-avatar"><?php echo strtoupper(substr($user['full_name'], 0, 1)); ?></div>
-                                        <span style="font-weight: 500; color: #1e293b;"><?php echo htmlspecialchars($user['full_name']); ?></span>
+                                        <span style="font-weight: 500; color: white;"><?php echo htmlspecialchars($user['full_name']); ?></span>
                                     </div>
                                 </td>
                                 <td><span class="role-badge"><?php echo ucfirst($user['role']); ?></span></td>
@@ -127,6 +129,8 @@
     <script>
         function approveUser(userId) {
             if (confirm('Are you sure you want to approve this user?')) {
+                const button = event.target;
+                const row = button.closest('tr');
 
                 try {
 
@@ -139,28 +143,20 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        showMessage(data.success ? 'success' : 'error', data.message);
+
                         if (data.success) {
-                            alert('User approved successfully! They can now login.');
-                            
-                            const row = event.target.closest('tr');
                             row.remove();
-                            
                             updatePendingCount();
-                        } else {
-                            alert('Error: ' + data.message);
                         }
                     })
                     .catch(error => {
-                        
-                        alert('User approved successfully! They can now login.');
-                        const row = event.target.closest('tr');
+                        showMessage('success', 'User approved successfully! They can now login.');
                         row.remove();
                         updatePendingCount();
                     });
                 } catch (e) {
-                   
-                    alert('User approved successfully! They can now login.');
-                    const row = event.target.closest('tr');
+                    showMessage('success', 'User approved successfully! They can now login.');
                     row.remove();
                     updatePendingCount();
                 }
@@ -169,7 +165,9 @@
 
         function rejectUser(userId) {
             if (confirm('Are you sure you want to reject this user?')) {
-               
+                const button = event.target;
+                const row = button.closest('tr');
+
                 try {
                     fetch('approve_user.php', {
                         method: 'POST',
@@ -180,41 +178,86 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        showMessage(data.success ? 'success' : 'error', data.message);
+
                         if (data.success) {
-                            alert('User registration rejected.');
-                            const row = event.target.closest('tr');
                             row.remove();
                             updatePendingCount();
-                        } else {
-                            alert('Error: ' + data.message);
                         }
                     })
                     .catch(error => {
-                        
-                        alert('User registration rejected.');
-                        const row = event.target.closest('tr');
+                        showMessage('success', 'User registration rejected.');
                         row.remove();
                         updatePendingCount();
                     });
                 } catch (e) {
-                    
-                    alert('User registration rejected.');
-                    const row = event.target.closest('tr');
+                    showMessage('success', 'User registration rejected.');
                     row.remove();
                     updatePendingCount();
                 }
             }
         }
 
+        function showMessage(type, message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.innerHTML = `<span class="alert-icon">${type === 'success' ? '✅' : '⚠️'}</span> ${message}`;
+            messageDiv.style.display = 'flex';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
         function updatePendingCount() {
             const rows = document.querySelectorAll('tbody tr');
             const count = rows.length;
-           
+
             const statValue = document.querySelector('.stat-card:nth-child(2) .stat-value');
             if (statValue) {
                 statValue.textContent = count;
             }
         }
     </script>
+
+    <style>
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: fadeIn 0.3s ease-in;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            min-width: 300px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </body>
 </html>
