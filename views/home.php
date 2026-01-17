@@ -152,26 +152,32 @@ if (isset($_POST['register'])) {
             require_once '../models/User.php';
             $userModel = new User();
 
-
-            $hashedPassword = password_hash($reg_password, PASSWORD_DEFAULT);
-
-            $userData = [
-                'email' => $reg_email,
-                'password' => $hashedPassword,
-                'full_name' => $full_name,
-                'role' => $role,
-                'is_verified' => false,
-                'account_status' => 'pending'
-            ];
-
-            if ($userModel->create($userData)) {
-                $_SESSION['signup_complete'] = true;
-                $_SESSION['signup_message'] = 'Registration submitted successfully! Your account is pending admin verification. You will be notified once approved.';
-                header("Location: home.php?signup=1");
-                exit;
-            } else {
+            // Check if name already exists
+            if ($userModel->findByName($full_name)) {
                 $reg_has_error = true;
-                $err_reg_email = "Database error: Could not save user. Please check database connection.";
+                $err_name = "This name is already taken. Please choose a different name.";
+            } else {
+
+                $hashedPassword = password_hash($reg_password, PASSWORD_DEFAULT);
+
+                $userData = [
+                    'email' => $reg_email,
+                    'password' => $hashedPassword,
+                    'full_name' => $full_name,
+                    'role' => $role,
+                    'is_verified' => false,
+                    'account_status' => 'pending'
+                ];
+
+                if ($userModel->create($userData)) {
+                    $_SESSION['signup_complete'] = true;
+                    $_SESSION['signup_message'] = 'Registration submitted successfully! Your account is pending admin verification. You will be notified once approved.';
+                    header("Location: home.php?signup=1");
+                    exit;
+                } else {
+                    $reg_has_error = true;
+                    $err_reg_email = "Database error: Could not save user. Please check database connection.";
+                }
             }
         } catch (Exception $e) {
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!isset($_SESSION["user_id"]) || !in_array($_SESSION["role"], ['farmer', 'fisherman'])) {
+if(!isset($_SESSION["user_id"])) {
     header("Location:../home.php");
     exit;
 }
@@ -59,8 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 try {
     require_once '../../models/Product.php';
     $productModel = new Product();
-    // For demo, get all products. In real app, filter by seller_id
-    $products = $productModel->getAllActive();
+    $products = $productModel->getBySeller($_SESSION['user_id']);
 } catch (Exception $e) {
     $products = [];
 }
@@ -138,8 +137,11 @@ try {
                             <td><?php echo htmlspecialchars($product['name']); ?></td>
                             <td><?php echo htmlspecialchars($product['category']); ?></td>
                             <td>৳<?php echo number_format($product['price'], 0); ?></td>
-                            <td><?php echo $product['stock_quantity']; ?> <?php echo htmlspecialchars($product['unit']); ?></td>
-                            <td><span class="status-badge">Active</span></td>
+                            <td><?php echo $product['stock_quantity'] ?? 0; ?> <?php echo htmlspecialchars($product['unit'] ?? 'kg'); ?></td>
+                            <td><span class="status-badge <?php
+                                $status = $product['approval_status'] ?? 'pending';
+                                echo $status === 'approved' ? 'approved' : ($status === 'pending' ? 'pending' : 'rejected');
+                            ?>"><?php echo ucfirst($status); ?></span></td>
                             <td class="text-right">
                                 <button class="btn-outline" onclick="editProduct(<?php echo $product['product_id']; ?>)">Edit</button>
                                 <form method="post" style="display:inline;">

@@ -37,29 +37,9 @@
             $products = $productModel->getDemoProducts();
         }
     } catch (Exception $e) {
-        // Fallback to demo data if database connection fails
-        $products = [
-            ['product_id' => 1, 'name' => 'Ilish (Hilsa)', 'price' => 2400, 'category' => 'Freshwater', 'image' => '🐟'],
-            ['product_id' => 2, 'name' => 'Rui (River)', 'price' => 750, 'category' => 'Freshwater', 'image' => '🐠'],
-            ['product_id' => 3, 'name' => 'Katla (River)', 'price' => 750, 'category' => 'Freshwater', 'image' => '🐟'],
-            ['product_id' => 4, 'name' => 'Ayre (Giant Catfish)', 'price' => 1500, 'category' => 'Freshwater', 'image' => '🐱'],
-            ['product_id' => 5, 'name' => 'Chitol (Featherback)', 'price' => 1250, 'category' => 'Freshwater', 'image' => '🐟'],
-            ['product_id' => 6, 'name' => 'Boal (Wallago)', 'price' => 800, 'category' => 'Freshwater', 'image' => '🐟'],
-            ['product_id' => 7, 'name' => 'Shing (Stinging Catfish)', 'price' => 570, 'category' => 'Freshwater', 'image' => '🐟'],
-            ['product_id' => 8, 'name' => 'Pabda (Pabo Catfish)', 'price' => 450, 'category' => 'Freshwater', 'image' => '🐟'],
-            ['product_id' => 9, 'name' => 'Rupchanda (Pomfret)', 'price' => 1200, 'category' => 'Sea Fish', 'image' => '🐟'],
-            ['product_id' => 10, 'name' => 'Koral (Seabass)', 'price' => 800, 'category' => 'Sea Fish', 'image' => '🐟'],
-            ['product_id' => 11, 'name' => 'Tuna', 'price' => 500, 'category' => 'Sea Fish', 'image' => '🐟'],
-            ['product_id' => 12, 'name' => 'Loitta (Bombay Duck)', 'price' => 350, 'category' => 'Sea Fish', 'image' => '🐟'],
-            ['product_id' => 13, 'name' => 'Surma (King Fish)', 'price' => 600, 'category' => 'Sea Fish', 'image' => '🐟'],
-            ['product_id' => 14, 'name' => 'Poa (Yellow Croaker)', 'price' => 550, 'category' => 'Sea Fish', 'image' => '🐟'],
-            ['product_id' => 15, 'name' => 'Golda Chingri (Prawn)', 'price' => 1350, 'category' => 'Shellfish', 'image' => '🦐'],
-            ['product_id' => 16, 'name' => 'Bagda/Tiger Shrimp', 'price' => 1000, 'category' => 'Shellfish', 'image' => '🦐'],
-            ['product_id' => 17, 'name' => 'Lobster', 'price' => 2000, 'category' => 'Shellfish', 'image' => '🦞'],
-            ['product_id' => 18, 'name' => 'Crab (Mud/Blue)', 'price' => 700, 'category' => 'Shellfish', 'image' => '🦀'],
-            ['product_id' => 19, 'name' => 'Churi Shutki (Dried)', 'price' => 1200, 'category' => 'Dried Fish', 'image' => '🐟'],
-            ['product_id' => 20, 'name' => 'Basa/Dory Fillet', 'price' => 580, 'category' => 'Frozen', 'image' => '🐟']
-        ];
+        // Show error if database connection fails
+        $products = [];
+        $error_message = "Unable to load products. Please try again later.";
     }
 ?>
 <!DOCTYPE html>
@@ -107,6 +87,13 @@
             </div>
         </div>
 
+        <?php if (isset($error_message)): ?>
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span>
+                <?php echo htmlspecialchars($error_message); ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Categories -->
         <div class="categories">
             <button class="category-btn active">All</button>
@@ -147,11 +134,15 @@
                                 <input type="hidden" name="product" value="<?php echo htmlspecialchars($product['name']); ?>">
                                 <button type="submit" class="wishlist-btn-small">❤️</button>
                             </form>
+                            <?php if (($product['stock_quantity'] ?? 0) > 0): ?>
                             <form method="post" style="display:inline;">
                                 <input type="hidden" name="action" value="add_cart">
                                 <input type="hidden" name="product" value="<?php echo htmlspecialchars($product['name']); ?>">
                                 <button type="submit" class="add-cart-btn">Add to Cart</button>
                             </form>
+                            <?php else: ?>
+                            <button class="out-of-stock-btn" disabled>Out of Stock</button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -216,5 +207,18 @@
             });
         });
     </script>
+
+    <style>
+        .out-of-stock-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
 </body>
 </html>

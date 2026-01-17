@@ -62,6 +62,18 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- Add approval_status column if not exists
+ALTER TABLE products ADD COLUMN IF NOT EXISTS approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' AFTER is_active;
+
+-- Update default for existing tables
+ALTER TABLE products ALTER COLUMN approval_status SET DEFAULT 'pending';
+
+-- Add index if not exists
+CREATE INDEX IF NOT EXISTS idx_approval ON products(approval_status);
+
+-- Update existing products to approved status (for existing databases)
+UPDATE products SET approval_status = 'approved' WHERE approval_status = 'pending' OR approval_status IS NULL;
+
 CREATE TABLE IF NOT EXISTS products (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -73,32 +85,39 @@ CREATE TABLE IF NOT EXISTS products (
     unit VARCHAR(50) DEFAULT 'kg',
     seller_id INT,
     is_active BOOLEAN DEFAULT TRUE,
+    approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (seller_id) REFERENCES users(user_id) ON DELETE SET NULL,
     INDEX idx_category (category),
     INDEX idx_active (is_active),
-    INDEX idx_seller (seller_id)
+    INDEX idx_seller (seller_id),
+    INDEX idx_approval (approval_status)
 );
 
-INSERT IGNORE INTO products (name, description, price, category, stock_quantity, unit) VALUES
-('Ilish (Hilsa)', 'Premium Hilsa fish from the Padma river', 2400.00, 'Freshwater', 50, 'kg'),
-('Rui (River)', 'Fresh Rui fish from local farms', 750.00, 'Freshwater', 100, 'kg'),
-('Katla (River)', 'Large Katla fish', 750.00, 'Freshwater', 80, 'kg'),
-('Ayre (Giant Catfish)', 'Giant catfish from river systems', 1500.00, 'Freshwater', 30, 'kg'),
-('Chitol (Featherback)', 'Unique featherback fish', 1250.00, 'Freshwater', 40, 'kg'),
-('Boal (Wallago)', 'Wallago catfish', 800.00, 'Freshwater', 60, 'kg'),
-('Shing (Stinging Catfish)', 'Freshwater catfish', 570.00, 'Freshwater', 70, 'kg'),
-('Pabda (Pabo Catfish)', 'Small catfish variety', 450.00, 'Freshwater', 90, 'kg'),
-('Rupchanda (Pomfret)', 'Silver pomfret from sea', 1200.00, 'Sea Fish', 35, 'kg'),
-('Koral (Seabass)', 'Fresh seabass', 800.00, 'Sea Fish', 45, 'kg'),
-('Tuna', 'Fresh tuna fish', 500.00, 'Sea Fish', 25, 'kg'),
-('Loitta (Bombay Duck)', 'Dried bombay duck', 350.00, 'Sea Fish', 55, 'kg'),
-('Surma (King Fish)', 'King fish from deep sea', 600.00, 'Sea Fish', 20, 'kg'),
-('Poa (Yellow Croaker)', 'Yellow croaker fish', 550.00, 'Sea Fish', 40, 'kg'),
-('Golda Chingri (Prawn)', 'Large tiger prawns', 1350.00, 'Shellfish', 30, 'kg'),
-('Bagda/Tiger Shrimp', 'Fresh tiger shrimp', 1000.00, 'Shellfish', 50, 'kg'),
-('Lobster', 'Fresh lobster', 2000.00, 'Shellfish', 15, 'kg'),
-('Crab (Mud/Blue)', 'Fresh crabs', 700.00, 'Shellfish', 25, 'kg'),
-('Churi Shutki (Dried)', 'Dried fish product', 1200.00, 'Dried Fish', 60, 'kg'),
-('Basa/Dory Fillet', 'Frozen fish fillet', 580.00, 'Frozen', 75, 'kg');
+INSERT IGNORE INTO products (name, description, price, category, stock_quantity, unit, seller_id, is_active, approval_status) VALUES
+('Ilish (Hilsa)', 'Premium Hilsa fish from the Padma river', 2400.00, 'Freshwater', 50, 'kg', 2, 1, 'approved'),
+('Rui (River)', 'Fresh Rui fish from local farms', 750.00, 'Freshwater', 100, 'kg', 3, 1, 'approved'),
+('Katla (River)', 'Large Katla fish', 750.00, 'Freshwater', 80, 'kg', 3, 1, 'approved'),
+('Ayre (Giant Catfish)', 'Giant catfish from river systems', 1500.00, 'Freshwater', 30, 'kg', 4, 1, 'approved'),
+('Chitol (Featherback)', 'Unique featherback fish', 1250.00, 'Freshwater', 40, 'kg', 4, 1, 'approved'),
+('Boal (Wallago)', 'Wallago catfish', 800.00, 'Freshwater', 60, 'kg', 2, 1, 'approved'),
+('Shing (Stinging Catfish)', 'Freshwater catfish', 570.00, 'Freshwater', 70, 'kg', 3, 1, 'approved'),
+('Pabda (Pabo Catfish)', 'Small catfish variety', 450.00, 'Freshwater', 90, 'kg', 4, 1, 'approved'),
+('Rupchanda (Pomfret)', 'Silver pomfret from sea', 1200.00, 'Sea Fish', 35, 'kg', 2, 1, 'approved'),
+('Koral (Seabass)', 'Fresh seabass', 800.00, 'Sea Fish', 45, 'kg', 3, 1, 'approved'),
+
+-- Pending products for admin to approve
+('Fresh Tilapia', 'Farm-raised tilapia fish', 350.00, 'Freshwater', 25, 'kg', 2, 1, 'pending'),
+('Organic Vegetables', 'Fresh organic vegetables from local farm', 150.00, 'Vegetables', 50, 'kg', 4, 1, 'pending'),
+('Shrimp (Large)', 'Premium large shrimp', 1800.00, 'Sea Fish', 15, 'kg', 3, 1, 'pending'),
+('Tuna', 'Fresh tuna fish', 500.00, 'Sea Fish', 25, 'kg', 2, 1, 'approved'),
+('Loitta (Bombay Duck)', 'Dried bombay duck', 350.00, 'Sea Fish', 55, 'kg', 3, 1, 'approved'),
+('Surma (King Fish)', 'King fish from deep sea', 600.00, 'Sea Fish', 20, 'kg', 2, 1, 'approved'),
+('Poa (Yellow Croaker)', 'Yellow croaker fish', 550.00, 'Sea Fish', 40, 'kg', 3, 1, 'approved'),
+('Golda Chingri (Prawn)', 'Large tiger prawns', 1350.00, 'Shellfish', 30, 'kg', 4, 1, 'approved'),
+('Bagda/Tiger Shrimp', 'Fresh tiger shrimp', 1000.00, 'Shellfish', 50, 'kg', 2, 1, 'approved'),
+('Lobster', 'Fresh lobster', 2000.00, 'Shellfish', 15, 'kg', 3, 1, 'approved'),
+('Crab (Mud/Blue)', 'Fresh crabs', 700.00, 'Shellfish', 25, 'kg', 4, 1, 'approved'),
+('Churi Shutki (Dried)', 'Dried fish product', 1200.00, 'Dried Fish', 60, 'kg', 2, 1, 'approved'),
+('Basa/Dory Fillet', 'Frozen fish fillet', 580.00, 'Frozen', 75, 'kg', 3, 1, 'approved');

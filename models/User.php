@@ -27,6 +27,14 @@ class User {
         return $stmt->fetch();
     }
 
+    public function findByName($name) {
+        if (!$this->db) return null;
+
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE full_name = ?");
+        $stmt->execute([$name]);
+        return $stmt->fetch();
+    }
+
     public function create($data) {
         if (!$this->db) return false;
 
