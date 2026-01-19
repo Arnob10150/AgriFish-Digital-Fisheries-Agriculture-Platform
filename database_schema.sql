@@ -121,3 +121,14 @@ INSERT IGNORE INTO products (name, description, price, category, stock_quantity,
 ('Crab (Mud/Blue)', 'Fresh crabs', 700.00, 'Shellfish', 25, 'kg', 4, 1, 'approved'),
 ('Churi Shutki (Dried)', 'Dried fish product', 1200.00, 'Dried Fish', 60, 'kg', 2, 1, 'approved'),
 ('Basa/Dory Fillet', 'Frozen fish fillet', 580.00, 'Frozen', 75, 'kg', 3, 1, 'approved');
+
+CREATE TABLE IF NOT EXISTS notices (
+    notice_id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    created_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_created_by (created_by),
+    INDEX idx_created_at (created_at)
+);

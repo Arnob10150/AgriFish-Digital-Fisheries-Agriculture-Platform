@@ -37,6 +37,7 @@
             <a href="#" class="nav-item">👥 User Management</a>
             <a href="#" class="nav-item">✅ Verification</a>
             <a href="products.php" class="nav-item">📦 Products</a>
+            <a href="notices.php" class="nav-item">📢 Notices</a>
             <a href="../profile.php" class="nav-item">👤 Profile</a>
             <a href="../?logout=1" class="nav-item">🚪 Logout</a>
         </nav>
