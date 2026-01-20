@@ -13,12 +13,24 @@ class Notice {
         }
     }
 
-    public function getAll() {
+    public function getAll($category = null) {
         if (!$this->pdo) return [];
 
         try {
-            $stmt = $this->pdo->query("SELECT * FROM notices ORDER BY created_at DESC");
+            $sql = "SELECT * FROM notices";
+            $params = [];
+
+            if ($category && $category !== 'all') {
+                $sql .= " WHERE category = ? OR category = 'all'";
+                $params[] = $category;
+            }
+
+            $sql .= " ORDER BY created_at DESC";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
             $notices = $stmt->fetchAll();
+
             // Add creator_name as "Admin" since only admins can create
             foreach ($notices as &$notice) {
                 $notice['creator_name'] = 'Admin';
@@ -49,10 +61,11 @@ class Notice {
         if (!$this->pdo) return false;
 
         try {
-            $stmt = $this->pdo->prepare("INSERT INTO notices (title, content, created_by) VALUES (?, ?, ?)");
+            $stmt = $this->pdo->prepare("INSERT INTO notices (title, content, category, created_by) VALUES (?, ?, ?, ?)");
             return $stmt->execute([
                 $data['title'],
                 $data['content'],
+                $data['category'] ?? 'all',
                 $data['created_by']
             ]);
         } catch (PDOException $e) {

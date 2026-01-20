@@ -1,14 +1,16 @@
 <?php
 session_start();
-header('Content-Type: application/json');
+header('Content-Type: application/toon');
+
+require_once '../models/toon.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    echo toon_encode(['success' => false, 'message' => 'Unauthorized']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    echo toon_encode(['success' => false, 'message' => 'Invalid request method']);
     exit;
 }
 
@@ -16,7 +18,7 @@ $productId = intval($_POST['product_id'] ?? 0);
 $action = $_POST['action'] ?? '';
 
 if (!$productId || !in_array($action, ['approve', 'reject'])) {
-    echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
+    echo toon_encode(['success' => false, 'message' => 'Invalid parameters']);
     exit;
 }
 
@@ -32,9 +34,9 @@ try {
         $message = $result ? 'Product rejected successfully' : 'Failed to reject product (ID: ' . $productId . ')';
     }
 
-    echo json_encode(['success' => $result, 'message' => $message]);
+    echo toon_encode(['success' => $result, 'message' => $message]);
 
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Action failed: ' . $e->getMessage()]);
+    echo toon_encode(['success' => false, 'message' => 'Action failed: ' . $e->getMessage()]);
 }
 ?>

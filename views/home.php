@@ -27,6 +27,12 @@ $err_name = "";
 $reg_email = "";
 $err_reg_email = "";
 $reg_password = "";
+$reg_confirm_password = "";
+$err_reg_confirm_password = "";
+$phone_number = "";
+$err_phone = "";
+$nid = "";
+$err_nid = "";
 $err_reg_password = "";
 $role = "";
 $err_role = "";
@@ -50,10 +56,10 @@ if (isset($_POST['submit'])) {
     if (!$has_error) {
 
         $demoUsers = [
-            'customer@dfap.com' => ['password' => 'customer123', 'role' => 'customer', 'name' => 'Customer User'],
-            'fisherman@dfap.com' => ['password' => 'fisherman123', 'role' => 'fisherman', 'name' => 'Fisherman User'],
-            'farmer@dfap.com' => ['password' => 'farmer123', 'role' => 'farmer', 'name' => 'Fish Farmer User'],
-            'admin@dfap.com' => ['password' => 'admin123', 'role' => 'admin', 'name' => 'Admin User'],
+            'customer@dfap.com' => ['password' => 'customer123', 'role' => 'customer', 'name' => 'Customer User', 'email' => 'customer@dfap.com', 'profile_picture' => null],
+            'fisherman@dfap.com' => ['password' => 'fisherman123', 'role' => 'fisherman', 'name' => 'Fisherman User', 'email' => 'fisherman@dfap.com', 'profile_picture' => null],
+            'farmer@dfap.com' => ['password' => 'farmer123', 'role' => 'farmer', 'name' => 'Fish Farmer User', 'email' => 'farmer@dfap.com', 'profile_picture' => null],
+            'admin@dfap.com' => ['password' => 'admin123', 'role' => 'admin', 'name' => 'Admin User', 'email' => 'admin@dfap.com', 'profile_picture' => null],
         ];
 
         if (isset($demoUsers[$email]) && $demoUsers[$email]['password'] === $password) {
@@ -61,9 +67,13 @@ if (isset($_POST['submit'])) {
             $user = $demoUsers[$email];
             $_SESSION['user_id'] = rand(1000, 9999);
             $_SESSION['user_name'] = $user['name'];
+            $_SESSION['user_email'] = $user['email'];
+            $_SESSION['user_phone'] = '+880' . rand(100000000, 999999999);
+            $_SESSION['user_nid'] = rand(100000000000, 999999999999);
             $_SESSION['role'] = $user['role'];
             $_SESSION['location'] = 'Dhaka';
             $_SESSION['language'] = 'english';
+            $_SESSION['profile_picture'] = $user['profile_picture'] ?? null;
             $_SESSION['login_time'] = time();
 
             redirectToRoleDashboard($user['role']);
@@ -88,9 +98,13 @@ if (isset($_POST['submit'])) {
 
                         $_SESSION['user_id'] = $user['user_id'];
                         $_SESSION['user_name'] = $user['full_name'];
+                        $_SESSION['user_email'] = $user['email'];
+                        $_SESSION['user_phone'] = $user['mobile_number'];
+                        $_SESSION['user_nid'] = $user['nid'];
                         $_SESSION['role'] = $user['role'];
                         $_SESSION['location'] = $user['location'];
                         $_SESSION['language'] = $user['language_preference'];
+                        $_SESSION['profile_picture'] = $user['profile_picture'];
                         $_SESSION['login_time'] = time();
 
                         redirectToRoleDashboard($user['role']);
@@ -133,6 +147,25 @@ if (isset($_POST['register'])) {
     } else {
         $reg_password = $_POST['reg_password'];
     }
+    if (empty($_POST['confirm_password'])) {
+        $err_reg_confirm_password = "*Confirm Password Required";
+        $reg_has_error = true;
+    } elseif ($_POST['confirm_password'] !== $_POST['reg_password']) {
+        $err_reg_confirm_password = "*Passwords do not match";
+        $reg_has_error = true;
+    }
+    if (empty($_POST['phone_number'])) {
+        $err_phone = "*Phone Number Required";
+        $reg_has_error = true;
+    } else {
+        $phone_number = $_POST['phone_number'];
+    }
+    if (empty($_POST['nid'])) {
+        $err_nid = "*NID Required";
+        $reg_has_error = true;
+    } else {
+        $nid = $_POST['nid'];
+    }
     if (empty($_POST['full_name'])) {
         $err_name = "*Full Name Required";
         $reg_has_error = true;
@@ -164,6 +197,8 @@ if (isset($_POST['register'])) {
                     'email' => $reg_email,
                     'password' => $hashedPassword,
                     'full_name' => $full_name,
+                    'mobile_number' => $phone_number,
+                    'nid' => $nid,
                     'role' => $role,
                     'is_verified' => false,
                     'account_status' => 'pending'
@@ -203,12 +238,20 @@ if (isset($_POST['register'])) {
     <div class="auth-grid">
 
         <div class="hero-section">
+            <div class="slideshow-background">
+                <!-- Slideshow images from your directory -->
+                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/1.jpg');"></div>
+                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/2.jpg');"></div>
+                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/3.jpg');"></div>
+                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/4.jpg');"></div>
+                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/5.jpg');"></div>
+            </div>
             <div class="hero-overlay"></div>
             <div class="hero-pattern-1"></div>
             <div class="hero-pattern-2"></div>
             <div class="hero-content">
                 <div class="hero-icon">
-                    <span class="fish-icon">🐟</span>
+                    <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="logo-icon">
                 </div>
                 <h1 class="hero-title">
                     Digital Fisheries & <br/>
@@ -234,12 +277,6 @@ if (isset($_POST['register'])) {
         <div class="auth-section">
             <div class="auth-container">
                 <div class="auth-header">
-                    <div class="language-selector">
-                        <select id="language" onchange="changeLanguage()">
-                            <option value="en" <?php echo (isset($_SESSION['language']) && $_SESSION['language'] == 'english') ? 'selected' : ''; ?>>English</option>
-                            <option value="bn" <?php echo (!isset($_SESSION['language']) || $_SESSION['language'] == 'bengali') ? 'selected' : ''; ?>>বাংলা</option>
-                        </select>
-                    </div>
                     <h2 class="auth-title">Welcome to DFAP</h2>
                     <p class="auth-subtitle">Sign in with your email and password</p>
                 </div>
@@ -304,6 +341,26 @@ if (isset($_POST['register'])) {
                                 </div>
 
                                 <div class="form-group">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="phone_number" name="phone_number" placeholder="+880 1XXX-XXXXXX"
+                                                class="form-input" value="<?php echo $phone_number; ?>" required>
+                                        <span class="input-icon">📱</span>
+                                    </div>
+                                    <span style="color:red"><?php echo $err_phone; ?></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="nid" class="form-label">National ID (NID)</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="nid" name="nid" placeholder="Enter NID Number"
+                                                class="form-input" value="<?php echo $nid; ?>" required>
+                                        <span class="input-icon">🆔</span>
+                                    </div>
+                                    <span style="color:red"><?php echo $err_nid; ?></span>
+                                </div>
+
+                                <div class="form-group">
                                     <label for="reg_email" class="form-label">Email</label>
                                     <div class="input-wrapper">
                                         <input type="email" id="reg_email" name="reg_email" placeholder="user@example.com"
@@ -321,6 +378,16 @@ if (isset($_POST['register'])) {
                                         <span class="input-icon">🔒</span>
                                     </div>
                                     <span style="color:red"><?php echo $err_reg_password; ?></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                                    <div class="input-wrapper">
+                                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password"
+                                                class="form-input" required>
+                                        <span class="input-icon">🔒</span>
+                                    </div>
+                                    <span style="color:red"><?php echo $err_reg_confirm_password; ?></span>
                                 </div>
 
                                 <div class="form-group">
@@ -397,12 +464,6 @@ if (isset($_POST['register'])) {
     </div>
 
     <script>
-   
-        function changeLanguage() {
-            const lang = document.getElementById('language').value;
-  
-            console.log('Language changed to:', lang);
-        }
 
  
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -482,6 +543,53 @@ if (isset($_POST['register'])) {
     </script>
 
     <style>
+        /* Slideshow Styles */
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+            /* Ensure background color doesn't hide slides if they take a moment to load */
+            background-color: hsl(222, 47%, 11%); 
+        }
+
+        .slideshow-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Behind everything */
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: slideAnimation 25s infinite;
+        }
+
+        /* Animation for 5 slides */
+        .slide:nth-child(1) { animation-delay: 0s; }
+        .slide:nth-child(2) { animation-delay: 5s; }
+        .slide:nth-child(3) { animation-delay: 10s; }
+        .slide:nth-child(4) { animation-delay: 15s; }
+        .slide:nth-child(5) { animation-delay: 20s; }
+
+        @keyframes slideAnimation {
+            0% { opacity: 0; }
+            4% { opacity: 1; } /* Fade-in for 1s */
+            20% { opacity: 1; } /* Stay visible for 4s */
+            24% { opacity: 0; } /* Fade-out for 1s */
+            100% { opacity: 0; }
+        }
+
+        /* Ensure content sits on top */
+        .hero-overlay { z-index: 1; }
+        .hero-pattern-1, .hero-pattern-2 { z-index: 2; }
+        .hero-content { z-index: 10; }
+        
         .alert {
             padding: 1rem;
             border-radius: 0.5rem;

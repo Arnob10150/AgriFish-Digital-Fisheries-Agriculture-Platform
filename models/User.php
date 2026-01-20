@@ -39,13 +39,14 @@ class User {
         if (!$this->db) return false;
 
         $stmt = $this->db->prepare("
-            INSERT INTO users (email, password, mobile_number, full_name, role, location, language_preference, is_verified, account_status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users (email, password, mobile_number, nid, full_name, role, location, language_preference, is_verified, account_status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         return $stmt->execute([
             $data['email'] ?? null,
             $data['password'] ?? null,
             $data['mobile_number'] ?? null,
+            $data['nid'] ?? null,
             $data['full_name'] ?? null,
             $data['role'],
             $data['location'] ?? null,

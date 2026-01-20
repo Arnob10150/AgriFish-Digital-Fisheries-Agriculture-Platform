@@ -57,19 +57,22 @@
     <title>Shopping Cart - DFAP</title>
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/dashboard.css">
+    <link rel="stylesheet" href="Css/cart.css">
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
+            <div class="sidebar-logo">
+                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+            </div>
             <div class="sidebar-subtitle">Customer Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="customer.php" class="nav-item">🏠 Marketplace</a>
             <a href="cart.php" class="nav-item active">🛒 My Cart (<?php echo count($cart); ?>)</a>
             <a href="orders.php" class="nav-item">📦 My Orders</a>
-            <a href="#" class="nav-item">💬 Messages</a>
+            <a href="notice.php" class="nav-item">📢 Notices</a>
             <a href="wishlist.php" class="nav-item">❤️ Wishlist</a>
             <a href="../profile.php" class="nav-item">👤 Profile</a>
             <a href="../../?logout=1" class="nav-item">🚪 Logout</a>
@@ -126,105 +129,5 @@
         <?php endif; ?>
     </div>
 
-    <style>
-        .empty-cart {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-
-        .empty-cart h2 {
-            color: #1e293b;
-            margin-bottom: 1rem;
-        }
-
-        .empty-cart p {
-            color: #64748b;
-            margin-bottom: 2rem;
-        }
-
-        .cart-items {
-            background: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .cart-item:last-child {
-            border-bottom: none;
-        }
-
-        .item-info h3 {
-            font-size: 1.125rem;
-            font-weight: bold;
-            color: #1e293b;
-            margin-bottom: 0.25rem;
-        }
-
-        .item-info p {
-            color: #64748b;
-        }
-
-        .item-price {
-            font-size: 1.125rem;
-            font-weight: bold;
-            color: #3b82f6;
-        }
-
-        .cart-summary {
-            background: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .summary-row:last-child {
-            border-bottom: none;
-        }
-
-        .summary-row.total {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #1e293b;
-            border-top: 2px solid #e2e8f0;
-            margin-top: 1rem;
-            padding-top: 1rem;
-        }
-
-        .btn-secondary {
-            padding: 0.75rem 1.5rem;
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-    </style>
 </body>
 </html>

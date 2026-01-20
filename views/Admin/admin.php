@@ -29,13 +29,14 @@
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
-            <div class="sidebar-subtitle">Admin Console</div>
+            <div class="sidebar-logo">
+                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
+                <span>DFAP</span>
+            </div>
+            <div class="sidebar-subtitle">Admin Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="#" class="nav-item active">🏠 Dashboard</a>
-            <a href="#" class="nav-item">👥 User Management</a>
-            <a href="#" class="nav-item">✅ Verification</a>
             <a href="products.php" class="nav-item">📦 Products</a>
             <a href="notices.php" class="nav-item">📢 Notices</a>
             <a href="../profile.php" class="nav-item">👤 Profile</a>
@@ -90,6 +91,8 @@
                         <tr>
                             <th>User Details</th>
                             <th>Role</th>
+                            <th>NID</th>
+                            <th>Phone</th>
                             <th>Email</th>
                             <th>Applied</th>
                             <th class="text-right">Actions</th>
@@ -98,7 +101,7 @@
                     <tbody>
                         <?php if (empty($pendingUsers)): ?>
                         <tr>
-                            <td colspan="5" style="text-align: center; color: #64748b; padding: 2rem;">
+                            <td colspan="7" style="text-align: center; color: #64748b; padding: 2rem;">
                                 No pending user verifications at this time.
                             </td>
                         </tr>
@@ -112,6 +115,8 @@
                                     </div>
                                 </td>
                                 <td><span class="role-badge"><?php echo ucfirst($user['role']); ?></span></td>
+                                <td style="color: #64748b;"><?php echo htmlspecialchars($user['nid'] ?? 'N/A'); ?></td>
+                                <td style="color: #64748b;"><?php echo htmlspecialchars($user['mobile_number'] ?? 'N/A'); ?></td>
                                 <td style="color: #64748b;"><?php echo htmlspecialchars($user['email']); ?></td>
                                 <td style="color: #64748b;"><?php echo date('M j, H:i', strtotime($user['created_at'])); ?></td>
                                 <td class="text-right">

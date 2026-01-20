@@ -80,16 +80,16 @@ try {
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
-            <div class="sidebar-subtitle">Admin Console</div>
+            <div class="sidebar-logo">
+                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
+                <span>DFAP</span>
+            </div>
+            <div class="sidebar-subtitle">Admin Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="admin.php" class="nav-item">🏠 Dashboard</a>
             <a href="products.php" class="nav-item active">📦 Products</a>
-            <a href="#" class="nav-item">👥 User Management</a>
-            <a href="#" class="nav-item">✅ Verification</a>
-            <a href="#" class="nav-item">📊 Reports</a>
-            <a href="#" class="nav-item">⚙️ System</a>
+            <a href="notices.php" class="nav-item">📢 Notices</a>
             <a href="../profile.php" class="nav-item">👤 Profile</a>
             <a href="../?logout=1" class="nav-item">🚪 Logout</a>
         </nav>

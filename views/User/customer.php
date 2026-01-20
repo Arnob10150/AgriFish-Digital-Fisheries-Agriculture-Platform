@@ -59,19 +59,22 @@
     <title>Marketplace - DFAP</title>
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/dashboard.css">
+    <link rel="stylesheet" href="Css/customer.css">
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
+            <div class="sidebar-logo">
+                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+            </div>
             <div class="sidebar-subtitle">Buyer Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="#" class="nav-item active">🏠 Marketplace</a>
             <a href="cart.php" class="nav-item">🛒 My Cart (<?php echo count($_SESSION['cart'] ?? []); ?>)</a>
             <a href="orders.php" class="nav-item">📦 My Orders</a>
-            <a href="#" class="nav-item">💬 Messages</a>
+            <a href="notice.php" class="nav-item">📢 Notices</a>
             <a href="wishlist.php" class="nav-item">❤️ Wishlist</a>
             <a href="../profile.php" class="nav-item">👤 Profile</a>
             <a href="../../?logout=1" class="nav-item">🚪 Logout</a>
@@ -240,82 +243,5 @@
         });
     </script>
 
-    <style>
-        .out-of-stock-btn {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .notices-section {
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 1rem;
-        }
-
-        .notices-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .notice-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .notice-card:hover {
-            border-color: #475569;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .notice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .notice-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: white;
-            margin: 0;
-        }
-
-        .notice-date {
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-
-        .notice-content {
-            color: #e2e8f0;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .notice-footer {
-            border-top: 1px solid #334155;
-            padding-top: 0.75rem;
-        }
-
-        .notice-author {
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-    </style>
 </body>
 </html>

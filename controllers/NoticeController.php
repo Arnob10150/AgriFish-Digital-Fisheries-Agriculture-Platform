@@ -8,6 +8,7 @@ class NoticeController {
 
     public function __construct() {
         require_once __DIR__ . '/../models/Notice.php';
+        require_once __DIR__ . '/../models/toon.php';
         $this->noticeModel = new Notice();
     }
 
@@ -22,14 +23,22 @@ class NoticeController {
 
         $title = trim($_POST['title'] ?? '');
         $content = trim($_POST['content'] ?? '');
+        $category = trim($_POST['category'] ?? 'all');
 
         if (empty($title) || empty($content)) {
             return ['success' => false, 'message' => 'Title and content are required'];
         }
 
+        // Validate category
+        $validCategories = ['all', 'customer', 'fisherman', 'farmer', 'admin', 'government_ngo'];
+        if (!in_array($category, $validCategories)) {
+            $category = 'all';
+        }
+
         $data = [
             'title' => $title,
             'content' => $content,
+            'category' => $category,
             'created_by' => $_SESSION['user_id']
         ];
 
@@ -91,8 +100,12 @@ class NoticeController {
         ];
     }
 
-    public function getAll() {
-        return $this->noticeModel->getAll();
+    public function getAll($userRole = null) {
+        // If no user role provided, try to get from session
+        if (!$userRole && isset($_SESSION['role'])) {
+            $userRole = $_SESSION['role'];
+        }
+        return $this->noticeModel->getAll($userRole);
     }
 
     public function getById($id) {
@@ -107,19 +120,19 @@ if (isset($_GET['action'])) {
 
     switch ($_GET['action']) {
         case 'create':
-            echo json_encode($controller->create());
+            echo toon_encode($controller->create());
             break;
         case 'update':
-            echo json_encode($controller->update());
+            echo toon_encode($controller->update());
             break;
         case 'delete':
-            echo json_encode($controller->delete());
+            echo toon_encode($controller->delete());
             break;
         case 'test':
-            echo json_encode(['success' => true, 'message' => 'Controller is working', 'session' => ['user_id' => $_SESSION['user_id'] ?? 'not set', 'role' => $_SESSION['role'] ?? 'not set']]);
+            echo toon_encode(['success' => true, 'message' => 'Controller is working', 'session' => ['user_id' => $_SESSION['user_id'] ?? 'not set', 'role' => $_SESSION['role'] ?? 'not set']]);
             break;
         default:
-            echo json_encode(['success' => false, 'message' => 'Invalid action']);
+            echo toon_encode(['success' => false, 'message' => 'Invalid action']);
     }
     exit;
 }
