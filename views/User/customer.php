@@ -41,6 +41,15 @@
         $products = [];
         $error_message = "Unable to load products. Please try again later.";
     }
+
+    // Load notices
+    try {
+        require_once __DIR__ . '/../../controllers/NoticeController.php';
+        $noticeController = new NoticeController();
+        $notices = $noticeController->getAll();
+    } catch (Exception $e) {
+        $notices = [];
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -92,6 +101,29 @@
                 <span class="alert-icon">⚠️</span>
                 <?php echo htmlspecialchars($error_message); ?>
             </div>
+        <?php endif; ?>
+
+        <!-- Notices -->
+        <?php if (!empty($notices)): ?>
+        <div class="notices-section">
+            <h2 class="section-title">📢 Important Notices</h2>
+            <div class="notices-container">
+                <?php foreach ($notices as $notice): ?>
+                <div class="notice-card">
+                    <div class="notice-header">
+                        <h3 class="notice-title"><?php echo htmlspecialchars($notice['title']); ?></h3>
+                        <span class="notice-date"><?php echo date('M j, Y', strtotime($notice['created_at'])); ?></span>
+                    </div>
+                    <div class="notice-content">
+                        <?php echo nl2br(htmlspecialchars($notice['content'])); ?>
+                    </div>
+                    <div class="notice-footer">
+                        <span class="notice-author">By: <?php echo htmlspecialchars($notice['creator_name']); ?></span>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
         <?php endif; ?>
 
         <!-- Categories -->
@@ -218,6 +250,71 @@
             font-size: 0.875rem;
             cursor: not-allowed;
             opacity: 0.6;
+        }
+
+        .notices-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .notices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .notice-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .notice-card:hover {
+            border-color: #475569;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .notice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .notice-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+        }
+
+        .notice-date {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .notice-content {
+            color: #e2e8f0;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .notice-footer {
+            border-top: 1px solid #334155;
+            padding-top: 0.75rem;
+        }
+
+        .notice-author {
+            font-size: 0.875rem;
+            color: #64748b;
         }
     </style>
 </body>
