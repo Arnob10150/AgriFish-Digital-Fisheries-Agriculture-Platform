@@ -2,6 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 
+require_once '../../models/toon.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
@@ -9,7 +10,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    echo toon_encode(['success' => false, 'message' => 'Invalid request method']);
     exit;
 }
 

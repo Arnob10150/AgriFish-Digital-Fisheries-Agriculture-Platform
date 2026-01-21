@@ -17,7 +17,9 @@ $user_name = $_SESSION['user_name'];
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
+            <div class="sidebar-logo">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+            </div>
             <div class="sidebar-subtitle">Buyer Portal</div>
         </div>
         <nav class="sidebar-nav">
@@ -29,7 +31,7 @@ $user_name = $_SESSION['user_name'];
         </nav>
     </div>
 
-    <!-- Main Content -->
+    
     <div class="main-content">
         <div class="dashboard-header">
             <div>
@@ -46,7 +48,7 @@ $user_name = $_SESSION['user_name'];
             </div>
         </div>
 
-        <!-- Categories -->
+      
         <div class="categories">
             <button class="category-btn active">All</button>
             <button class="category-btn">Sea Fish</button>
@@ -56,7 +58,7 @@ $user_name = $_SESSION['user_name'];
             <button class="category-btn">Frozen</button>
         </div>
 
-        <!-- Product Grid -->
+      
         <div class="product-grid">
             <div class="product-card">
                 <div class="product-image">🐟</div>

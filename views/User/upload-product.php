@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../config.php';
 if(!isset($_SESSION["user_id"])) {
     header("Location:../home.php");
     exit;
@@ -72,29 +73,33 @@ try {
     <title>My Products - DFAP</title>
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/dashboard.css">
+    <link rel="stylesheet" href="Css/modal.css">
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
+            <div class="sidebar-logo">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+            </div>
             <div class="sidebar-subtitle"><?php echo ucfirst($_SESSION['role']); ?> Portal</div>
         </div>
         <nav class="sidebar-nav">
-            <a href="<?php echo $_SESSION['role']; ?>.php" class="nav-item">🏠 Dashboard</a>
-            <a href="upload-product.php" class="nav-item active">📦 My Products</a>
             <?php if ($_SESSION['role'] == 'farmer'): ?>
-                <a href="#" class="nav-item">📊 Sensors</a>
-                <a href="#" class="nav-item">🐟 Products</a>
-                <a href="#" class="nav-item">👨‍🔬 Expert Advice</a>
-                <a href="#" class="nav-item">📜 Grants</a>
-            <?php else: ?>
-                <a href="#" class="nav-item">💰 Sales</a>
-                <a href="#" class="nav-item">🌊 Weather</a>
-                <a href="#" class="nav-item">🚨 SOS</a>
+                <a href="farmer.php" class="nav-item">🏠 Farm Overview</a>
+                <a href="upload-product.php" class="nav-item active">📦 My Products</a>
+                <a href="sales.php" class="nav-item">💰 Sales</a>
+                <a href="notice.php" class="nav-item">📢 Notices</a>
+                <a href="../profile.php" class="nav-item">👤 Profile</a>
+                <a href="../../?logout=1" class="nav-item">🚪 Logout</a>
+            <?php elseif ($_SESSION['role'] == 'fisherman'): ?>
+                <a href="fisherman.php" class="nav-item">🏠 Dashboard</a>
+                <a href="sales.php" class="nav-item">💰 Sales</a>
+                <a href="upload-product.php" class="nav-item active">📦 My Products</a>
+                <a href="notice.php" class="nav-item">📢 Notices</a>
+                <a href="../profile.php" class="nav-item">👤 Profile</a>
+                <a href="../../?logout=1" class="nav-item">🚪 Logout</a>
             <?php endif; ?>
-            <a href="../profile.php" class="nav-item">👤 Profile</a>
-            <a href="../../?logout=1" class="nav-item">🚪 Logout</a>
         </nav>
     </div>
 
@@ -198,7 +203,7 @@ try {
                     </div>
                     <div class="form-group">
                         <label for="image" class="form-label">Image (Emoji or URL)</label>
-                        <input type="text" id="image" name="image" class="form-input" placeholder="🐟">
+                        <input type="text" id="image" name="image" class="form-input" placeholder="<?php echo IMAGE_BASE_PATH; ?>fish/... or 🐟">
                     </div>
                     <div class="form-group">
                         <label for="stock_quantity" class="form-label">Stock Quantity</label>
@@ -249,58 +254,5 @@ try {
         }
     </script>
 
-    <style>
-        .modal {
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 0;
-            border-radius: 0.75rem;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #64748b;
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        textarea.form-input {
-            resize: vertical;
-            min-height: 80px;
-        }
-    </style>
 </body>
 </html>

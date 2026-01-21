@@ -13,12 +13,24 @@ class Notice {
         }
     }
 
-    public function getAll() {
+    public function getAll($category = null) {
         if (!$this->pdo) return [];
 
         try {
-            $stmt = $this->pdo->query("SELECT * FROM notices ORDER BY created_at DESC");
+            $sql = "SELECT * FROM notices";
+            $params = [];
+
+            if ($category && $category !== 'all') {
+                $sql .= " WHERE category = ? OR category = 'all'";
+                $params[] = $category;
+            }
+
+            $sql .= " ORDER BY created_at DESC";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
             $notices = $stmt->fetchAll();
+
             // Add creator_name as "Admin" since only admins can create
             foreach ($notices as &$notice) {
                 $notice['creator_name'] = 'Admin';
@@ -49,10 +61,11 @@ class Notice {
         if (!$this->pdo) return false;
 
         try {
-            $stmt = $this->pdo->prepare("INSERT INTO notices (title, content, created_by) VALUES (?, ?, ?)");
+            $stmt = $this->pdo->prepare("INSERT INTO notices (title, content, category, created_by) VALUES (?, ?, ?, ?)");
             return $stmt->execute([
                 $data['title'],
                 $data['content'],
+                $data['category'] ?? 'customer',
                 $data['created_by']
             ]);
         } catch (PDOException $e) {
@@ -64,12 +77,14 @@ class Notice {
         if (!$this->pdo) return false;
 
         try {
-            $stmt = $this->pdo->prepare("UPDATE notices SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE notice_id = ?");
-            return $stmt->execute([
+            $stmt = $this->pdo->prepare("UPDATE notices SET title = ?, content = ?, category = ?, updated_at = CURRENT_TIMESTAMP WHERE notice_id = ?");
+            $stmt->execute([
                 $data['title'],
                 $data['content'],
+                $data['category'] ?? 'customer',
                 $id
             ]);
+            return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             return false;
         }
@@ -80,7 +95,8 @@ class Notice {
 
         try {
             $stmt = $this->pdo->prepare("DELETE FROM notices WHERE notice_id = ?");
-            return $stmt->execute([$id]);
+            $stmt->execute([$id]);
+            return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             return false;
         }

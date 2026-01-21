@@ -18,19 +18,20 @@
     <title>Notice Management - DFAP</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <script src="Script.js"></script>
+    <script src="js/Script.js"></script>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
-            <div class="sidebar-subtitle">Admin Console</div>
+            <div class="sidebar-logo">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
+                <span>DFAP</span>
+            </div>
+            <div class="sidebar-subtitle">Admin Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="admin.php" class="nav-item">🏠 Dashboard</a>
-            <a href="#" class="nav-item">👥 User Management</a>
-            <a href="#" class="nav-item">✅ Verification</a>
             <a href="products.php" class="nav-item">📦 Products</a>
             <a href="#" class="nav-item active">📢 Notices</a>
             <a href="../profile.php" class="nav-item">👤 Profile</a>
@@ -59,6 +60,7 @@
                     <thead>
                         <tr>
                             <th>Title</th>
+                            <th>Category</th>
                             <th>Content</th>
                             <th>Created By</th>
                             <th>Created At</th>
@@ -68,7 +70,7 @@
                     <tbody>
                         <?php if (empty($notices)): ?>
                         <tr>
-                            <td colspan="5" style="text-align: center; color: #64748b; padding: 2rem;">
+                            <td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">
                                 No notices created yet.
                             </td>
                         </tr>
@@ -76,13 +78,18 @@
                             <?php foreach ($notices as $notice): ?>
                             <tr>
                                 <td style="font-weight: 500;"><?php echo htmlspecialchars($notice['title']); ?></td>
+                                <td>
+                                    <span class="category-badge category-<?php echo htmlspecialchars($notice['category'] ?? 'all'); ?>">
+                                        <?php echo ucfirst(htmlspecialchars($notice['category'] ?? 'all')); ?>
+                                    </span>
+                                </td>
                                 <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b;">
                                     <?php echo htmlspecialchars(substr($notice['content'], 0, 100)); ?>...
                                 </td>
                                 <td><?php echo htmlspecialchars($notice['creator_name']); ?></td>
                                 <td style="color: #64748b;"><?php echo date('M j, Y H:i', strtotime($notice['created_at'])); ?></td>
                                 <td class="text-right">
-                                    <button class="btn-outline" onclick="editNotice(<?php echo $notice['notice_id']; ?>, '<?php echo addslashes($notice['title']); ?>', '<?php echo addslashes($notice['content']); ?>')">Edit</button>
+                                    <button class="btn-outline" onclick="editNotice(<?php echo $notice['notice_id']; ?>, '<?php echo addslashes($notice['title']); ?>', '<?php echo addslashes($notice['content']); ?>', '<?php echo addslashes($notice['category'] ?? 'all'); ?>')">Edit</button>
                                     <button class="btn-danger" onclick="deleteNotice(<?php echo $notice['notice_id']; ?>)">Delete</button>
                                 </td>
                             </tr>
@@ -108,6 +115,17 @@
                     <input type="text" id="title" name="title" required>
                 </div>
                 <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" required>
+                        <option value="all">All Users</option>
+                        <option value="customer">Customers</option>
+                        <option value="fisherman">Fishermen</option>
+                        <option value="farmer">Farmers</option>
+                        <option value="admin">Admins</option>
+                        <option value="government_ngo">Government/NGO</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="content">Content</label>
                     <textarea id="content" name="content" rows="6" required></textarea>
                 </div>
@@ -124,14 +142,16 @@
             document.getElementById('modalTitle').textContent = 'Create Notice';
             document.getElementById('noticeId').value = '';
             document.getElementById('title').value = '';
+            document.getElementById('category').value = 'all';
             document.getElementById('content').value = '';
             document.getElementById('noticeModal').style.display = 'flex';
         }
 
-        function editNotice(id, title, content) {
+        function editNotice(id, title, content, category) {
             document.getElementById('modalTitle').textContent = 'Edit Notice';
             document.getElementById('noticeId').value = id;
             document.getElementById('title').value = title;
+            document.getElementById('category').value = category || 'all';
             document.getElementById('content').value = content;
             document.getElementById('noticeModal').style.display = 'flex';
         }
@@ -142,12 +162,12 @@
 
         function deleteNotice(id) {
             if (confirm('Are you sure you want to delete this notice?')) {
+                const formData = new FormData();
+                formData.append('notice_id', id);
                 fetch('../../controllers/NoticeController.php?action=delete', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'notice_id=' + id
+                    credentials: 'include',
+                    body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -169,6 +189,7 @@
 
             fetch('../../controllers/NoticeController.php?action=' + action, {
                 method: 'POST',
+                credentials: 'include',
                 body: formData
             })
             .then(response => response.json())
@@ -252,7 +273,8 @@
         }
 
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid #334155;
@@ -322,6 +344,44 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .category-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .category-all {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .category-customer {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .category-fisherman {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .category-farmer {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .category-admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .category-government_ngo {
+            background: #fce7f3;
+            color: #be185d;
         }
     </style>
 </body>

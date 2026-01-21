@@ -1,10 +1,12 @@
 CREATE TABLE IF NOT EXISTS users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE,
     email VARCHAR(255) UNIQUE,
     mobile_number VARCHAR(15) UNIQUE,
+    nid VARCHAR(20) UNIQUE,
     password VARCHAR(255),
     full_name VARCHAR(100),
-    role ENUM('customer', 'fisherman', 'farmer', 'admin') NOT NULL,
+    role ENUM('customer', 'fisherman', 'farmer', 'admin', 'government_ngo') NOT NULL,
     location VARCHAR(255),
     language_preference ENUM('bengali', 'english') DEFAULT 'bengali',
     profile_picture VARCHAR(255),
@@ -14,8 +16,10 @@ CREATE TABLE IF NOT EXISTS users (
     locked_until DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_username (username),
     INDEX idx_email (email),
     INDEX idx_mobile (mobile_number),
+    INDEX idx_nid (nid),
     INDEX idx_role (role)
 );
 
@@ -45,6 +49,15 @@ INSERT IGNORE INTO users (email, password, mobile_number, full_name, role, is_ve
 ('admin@dfap.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '01512345678', 'System Administrator', 'admin', TRUE, 'active');
 
 INSERT IGNORE INTO users (email, password, mobile_number, full_name, role, location, is_verified, account_status) VALUES
+('fisherman@dfap.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '01812345678', 'Fisherman User', 'fisherman', 'Cox\'s Bazar', TRUE, 'active');
+
+INSERT IGNORE INTO users (email, password, mobile_number, full_name, role, location, is_verified, account_status) VALUES
+('farmer@dfap.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '01912345678', 'Farmer User', 'farmer', 'Khulna', TRUE, 'active');
+
+INSERT IGNORE INTO users (email, password, mobile_number, full_name, role, location, is_verified, account_status) VALUES
+('customer@dfap.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '01712345678', 'Customer User', 'customer', 'Dhaka', TRUE, 'active');
+
+INSERT IGNORE INTO users (email, password, mobile_number, full_name, role, location, is_verified, account_status) VALUES
 ('customer@dfap.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '01712345678', 'Rahim Customer', 'customer', 'Dhaka', TRUE, 'active'),
 ('fisherman@dfap.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '01812345678', 'Karim Fisherman', 'fisherman', 'Cox\'s Bazar', TRUE, 'active'),
 ('farmer@dfap.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '01912345678', 'Farmer Hassan', 'farmer', 'Khulna', TRUE, 'active');
@@ -61,18 +74,6 @@ BEGIN
     DELETE FROM user_sessions WHERE expires_at < NOW();
 END$$
 DELIMITER ;
-
--- Add approval_status column if not exists
-ALTER TABLE products ADD COLUMN IF NOT EXISTS approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' AFTER is_active;
-
--- Update default for existing tables
-ALTER TABLE products ALTER COLUMN approval_status SET DEFAULT 'pending';
-
--- Add index if not exists
-CREATE INDEX IF NOT EXISTS idx_approval ON products(approval_status);
-
--- Update existing products to approved status (for existing databases)
-UPDATE products SET approval_status = 'approved' WHERE approval_status = 'pending' OR approval_status IS NULL;
 
 CREATE TABLE IF NOT EXISTS products (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -95,8 +96,8 @@ CREATE TABLE IF NOT EXISTS products (
     INDEX idx_approval (approval_status)
 );
 
-INSERT IGNORE INTO products (name, description, price, category, stock_quantity, unit, seller_id, is_active, approval_status) VALUES
-('Ilish (Hilsa)', 'Premium Hilsa fish from the Padma river', 2400.00, 'Freshwater', 50, 'kg', 2, 1, 'approved'),
+INSERT IGNORE INTO products (name, description, price, category, stock_quantity, unit, seller_id, is_active, approval_status, image) VALUES
+('Ilish (Hilsa)', 'Premium Hilsa fish from the Padma river', 2400.00, 'Freshwater', 50, 'kg', 2, 1, 'approved', 'fish/Fresh Fish/Hilsha.jpg'),
 ('Rui (River)', 'Fresh Rui fish from local farms', 750.00, 'Freshwater', 100, 'kg', 3, 1, 'approved'),
 ('Katla (River)', 'Large Katla fish', 750.00, 'Freshwater', 80, 'kg', 3, 1, 'approved'),
 ('Ayre (Giant Catfish)', 'Giant catfish from river systems', 1500.00, 'Freshwater', 30, 'kg', 4, 1, 'approved'),
@@ -107,7 +108,6 @@ INSERT IGNORE INTO products (name, description, price, category, stock_quantity,
 ('Rupchanda (Pomfret)', 'Silver pomfret from sea', 1200.00, 'Sea Fish', 35, 'kg', 2, 1, 'approved'),
 ('Koral (Seabass)', 'Fresh seabass', 800.00, 'Sea Fish', 45, 'kg', 3, 1, 'approved'),
 
--- Pending products for admin to approve
 ('Fresh Tilapia', 'Farm-raised tilapia fish', 350.00, 'Freshwater', 25, 'kg', 2, 1, 'pending'),
 ('Organic Vegetables', 'Fresh organic vegetables from local farm', 150.00, 'Vegetables', 50, 'kg', 4, 1, 'pending'),
 ('Shrimp (Large)', 'Premium large shrimp', 1800.00, 'Sea Fish', 15, 'kg', 3, 1, 'pending'),
@@ -126,9 +126,31 @@ CREATE TABLE IF NOT EXISTS notices (
     notice_id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
+    category ENUM('all', 'customer', 'fisherman', 'farmer', 'admin', 'government_ngo') NOT NULL DEFAULT 'all',
     created_by INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_created_by (created_by),
-    INDEX idx_created_at (created_at)
+    INDEX idx_created_at (created_at),
+    INDEX idx_category (category)
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    product_name VARCHAR(255),
+    quantity INT DEFAULT 1,
+    price DECIMAL(10,2),
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS catches (
+    catch_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    catch_date DATE,
+    fish_type VARCHAR(255),
+    weight_kg DECIMAL(10,2),
+    price_per_kg DECIMAL(10,2),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

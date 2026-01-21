@@ -1,13 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 class NoticeController {
     private $noticeModel;
 
     public function __construct() {
-        require_once __DIR__ . '/../models/Notice.php';
+        require_once '../../models/Notice.php';
         $this->noticeModel = new Notice();
     }
 
@@ -52,6 +49,7 @@ class NoticeController {
         $id = intval($_POST['notice_id'] ?? 0);
         $title = trim($_POST['title'] ?? '');
         $content = trim($_POST['content'] ?? '');
+        $category = trim($_POST['category'] ?? 'all');
 
         if (!$id || empty($title) || empty($content)) {
             return ['success' => false, 'message' => 'Invalid parameters'];
@@ -59,7 +57,8 @@ class NoticeController {
 
         $data = [
             'title' => $title,
-            'content' => $content
+            'content' => $content,
+            'category' => $category
         ];
 
         $result = $this->noticeModel->update($id, $data);
@@ -102,6 +101,7 @@ class NoticeController {
 
 // Handle AJAX requests
 if (isset($_GET['action'])) {
+    session_start();
     header('Content-Type: application/json');
     $controller = new NoticeController();
 
@@ -114,9 +114,6 @@ if (isset($_GET['action'])) {
             break;
         case 'delete':
             echo json_encode($controller->delete());
-            break;
-        case 'test':
-            echo json_encode(['success' => true, 'message' => 'Controller is working', 'session' => ['user_id' => $_SESSION['user_id'] ?? 'not set', 'role' => $_SESSION['role'] ?? 'not set']]);
             break;
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action']);

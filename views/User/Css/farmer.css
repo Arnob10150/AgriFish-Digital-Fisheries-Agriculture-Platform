@@ -1,0 +1,224 @@
+.notices-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.notices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notice-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.notice-card:hover {
+    border-color: #475569;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.notice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.notice-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.notice-date {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.notice-content {
+    color: #e2e8f0;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.notice-footer {
+    border-top: 1px solid #334155;
+    padding-top: 0.75rem;
+}
+
+.notice-author {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.pond-card {
+    flex-wrap: wrap;
+    position: relative;
+}
+.pond-tasks {
+    width: 100%;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+.pond-tasks h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.75rem;
+}
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.task-item input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+.task-item label {
+    color: #64748b;
+    cursor: pointer;
+}
+.task-item input[type="checkbox"]:checked + label {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+.task-progress {
+    margin-top: 1rem;
+}
+.progress-bar-container {
+    width: 100%;
+    background-color: #e2e8f0;
+    border-radius: 9999px;
+    height: 0.5rem;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #3b82f6;
+    border-radius: 9999px;
+    transition: width 0.3s ease-in-out;
+}
+.task-progress span {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+
+.add-task-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    margin-bottom: 1rem; 
+}
+.add-task-input {
+    flex: 1;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+.add-task-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+.add-task-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    background: #3b82f6;
+    color: white;
+    border-radius: 0.375rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.add-task-btn:hover {
+    background: #2563eb;
+}
+
+.pond-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+.pond-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: background 0.2s;
+}
+.pond-action-btn:hover {
+    background: #f1f5f9;
+}
+
+
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: white;
+    border-radius: 0.75rem;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #64748b;
+}
+.modal-body {
+    padding: 1.5rem;
+}
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}

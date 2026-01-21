@@ -11,7 +11,9 @@
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
+            <div class="sidebar-logo">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+            </div>
             <div class="sidebar-subtitle">Admin Console</div>
         </div>
         <nav class="sidebar-nav">

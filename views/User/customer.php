@@ -1,16 +1,17 @@
 <?php
     session_start();
+    require_once __DIR__ . '/../../config.php';
     if(!isset($_SESSION["user_id"]) || $_SESSION["role"] != "customer")
     {
         header("Location:../home.php");
         exit;
     }
 
-    // Initialize cart and wishlist
+  
     if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
     if (!isset($_SESSION['wishlist'])) $_SESSION['wishlist'] = [];
 
-    // Handle add to cart/wishlist
+   
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $action = $_POST['action'] ?? '';
         $product = $_POST['product'] ?? '';
@@ -26,23 +27,23 @@
         }
     }
 
-    // Load products from database or use demo data
+   
     try {
         require_once '../../models/Product.php';
         $productModel = new Product();
         $products = $productModel->getAllActive();
 
-        // If no products in database, use demo data
+       
         if (empty($products)) {
             $products = $productModel->getDemoProducts();
         }
     } catch (Exception $e) {
-        // Show error if database connection fails
+       
         $products = [];
         $error_message = "Unable to load products. Please try again later.";
     }
 
-    // Load notices
+  
     try {
         require_once __DIR__ . '/../../controllers/NoticeController.php';
         $noticeController = new NoticeController();
@@ -59,26 +60,29 @@
     <title>Marketplace - DFAP</title>
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/dashboard.css">
+    <link rel="stylesheet" href="Css/customer.css">
 </head>
 <body>
-    <!-- Sidebar -->
+    
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
+            <div class="sidebar-logo">
+                <img src="<?php echo IMAGE_BASE_PATH; ?>icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+            </div>
             <div class="sidebar-subtitle">Buyer Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="#" class="nav-item active">🏠 Marketplace</a>
             <a href="cart.php" class="nav-item">🛒 My Cart (<?php echo count($_SESSION['cart'] ?? []); ?>)</a>
             <a href="orders.php" class="nav-item">📦 My Orders</a>
-            <a href="#" class="nav-item">💬 Messages</a>
+            <a href="notice.php" class="nav-item">📢 Notices</a>
             <a href="wishlist.php" class="nav-item">❤️ Wishlist</a>
             <a href="../profile.php" class="nav-item">👤 Profile</a>
             <a href="../../?logout=1" class="nav-item">🚪 Logout</a>
         </nav>
     </div>
 
-    <!-- Main Content -->
+
     <div class="main-content">
         <div class="dashboard-header">
             <div>
@@ -103,7 +107,7 @@
             </div>
         <?php endif; ?>
 
-        <!-- Notices -->
+      
         <?php if (!empty($notices)): ?>
         <div class="notices-section">
             <h2 class="section-title">📢 Important Notices</h2>
@@ -126,7 +130,7 @@
         </div>
         <?php endif; ?>
 
-        <!-- Categories -->
+    
         <div class="categories">
             <button class="category-btn active">All</button>
             <button class="category-btn">Sea Fish</button>
@@ -136,16 +140,25 @@
             <button class="category-btn">Frozen</button>
         </div>
 
-        <!-- Product Grid -->
+     
         <div class="product-grid">
             <?php foreach ($products as $product): ?>
             <div class="product-card">
                 <div class="product-image">
-                    <img src="<?php echo htmlspecialchars($product['image']); ?>"
-                         alt="<?php echo htmlspecialchars($product['name']); ?>"
-                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo $product['image'] ?? '🐟'; ?></div>
+                    <?php $image = $product['image'] ?? '🐟'; ?>
+                    <?php if (filter_var($image, FILTER_VALIDATE_URL)): ?>
+                        <img src="<?php echo htmlspecialchars($image); ?>"
+                             alt="<?php echo htmlspecialchars($product['name']); ?>"
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo htmlspecialchars($image); ?></div>
+                    <?php else: ?>
+                        <img src="<?php echo htmlspecialchars(IMAGE_BASE_PATH . $image); ?>"
+                             alt="<?php echo htmlspecialchars($product['name']); ?>"
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo htmlspecialchars($image); ?></div>
+                    <?php endif; ?>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
@@ -184,13 +197,13 @@
     </div>
 
     <script>
-        // Get DOM elements
+    
         const categoryBtns = document.querySelectorAll('.category-btn');
         const productCards = document.querySelectorAll('.product-card');
         const searchInput = document.querySelector('.search-input');
         const addToCartBtns = document.querySelectorAll('.add-cart-btn');
 
-        // Category filtering
+      
         categoryBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 categoryBtns.forEach(b => b.classList.remove('active'));
@@ -240,82 +253,5 @@
         });
     </script>
 
-    <style>
-        .out-of-stock-btn {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .notices-section {
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 1rem;
-        }
-
-        .notices-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .notice-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .notice-card:hover {
-            border-color: #475569;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .notice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .notice-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: white;
-            margin: 0;
-        }
-
-        .notice-date {
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-
-        .notice-content {
-            color: #e2e8f0;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .notice-footer {
-            border-top: 1px solid #334155;
-            padding-top: 0.75rem;
-        }
-
-        .notice-author {
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-    </style>
 </body>
 </html>

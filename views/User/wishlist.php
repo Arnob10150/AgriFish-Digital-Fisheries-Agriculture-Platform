@@ -39,14 +39,16 @@ foreach ($allProducts as $product) {
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🐟 DFAP</div>
+            <div class="sidebar-logo">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+            </div>
             <div class="sidebar-subtitle">Buyer Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="customer.php" class="nav-item">🏠 Marketplace</a>
             <a href="cart.php" class="nav-item">🛒 My Cart (<?php echo count($_SESSION['cart'] ?? []); ?>)</a>
             <a href="orders.php" class="nav-item">📦 My Orders</a>
-            <a href="#" class="nav-item">💬 Messages</a>
+            <a href="notice.php" class="nav-item">📢 Notices</a>
             <a href="wishlist.php" class="nav-item active">❤️ Wishlist</a>
             <a href="../profile.php" class="nav-item">👤 Profile</a>
             <a href="../../?logout=1" class="nav-item">🚪 Logout</a>
@@ -79,11 +81,16 @@ foreach ($allProducts as $product) {
                 ?>
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="<?php echo htmlspecialchars($product['image']); ?>"
-                             alt="<?php echo htmlspecialchars($product['name']); ?>"
-                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo $product['image'] ?? '🐟'; ?></div>
+                        <?php $image = $product['image'] ?? '🐟'; ?>
+                        <?php if (filter_var($image, FILTER_VALIDATE_URL) || strpos($image, '/') === 0): ?>
+                            <img src="<?php echo htmlspecialchars($image); ?>"
+                                 alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo htmlspecialchars($image); ?></div>
+                        <?php else: ?>
+                            <div style="font-size: 3rem; text-align: center; line-height: 1;"><?php echo htmlspecialchars($image); ?></div>
+                        <?php endif; ?>
                     </div>
                     <div class="product-content">
                         <div class="product-header">

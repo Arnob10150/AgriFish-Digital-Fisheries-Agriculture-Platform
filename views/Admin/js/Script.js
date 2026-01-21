@@ -1,8 +1,9 @@
 const btn=document.getElementById("getAllProduct");
-btn.addEventListener("click", function(){
-    window.location.href="GetAllProducts.php";
+if (btn) {
+    btn.addEventListener("click", function(){
+        window.location.href="GetAllProducts.php";
+    });
 }
-);
 
 function approveProduct(productId) {
     if (confirm('Are you sure you want to approve this product?')) {
@@ -72,12 +73,12 @@ function deleteProduct(productId) {
 }
 
 function showStatusMenu(productId, currentStatus) {
-    // Hide all other menus first
+   
     document.querySelectorAll('.status-menu').forEach(menu => {
         menu.style.display = 'none';
     });
 
-    // Show the clicked menu
+    
     const menu = document.getElementById('status-menu-' + productId);
     if (menu.style.display === 'none' || menu.style.display === '') {
         menu.style.display = 'block';
@@ -110,7 +111,7 @@ function changeStatus(productId, newStatus) {
     }
 }
 
-// Close status menus when clicking outside
+
 document.addEventListener('click', function(event) {
     if (!event.target.classList.contains('status-badge')) {
         document.querySelectorAll('.status-menu').forEach(menu => {
