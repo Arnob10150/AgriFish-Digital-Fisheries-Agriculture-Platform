@@ -1,14 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 class NoticeController {
     private $noticeModel;
 
     public function __construct() {
-        require_once __DIR__ . '/../models/Notice.php';
-        require_once __DIR__ . '/../models/toon.php';
+        require_once '../../models/Notice.php';
         $this->noticeModel = new Notice();
     }
 
@@ -23,22 +19,14 @@ class NoticeController {
 
         $title = trim($_POST['title'] ?? '');
         $content = trim($_POST['content'] ?? '');
-        $category = trim($_POST['category'] ?? 'all');
 
         if (empty($title) || empty($content)) {
             return ['success' => false, 'message' => 'Title and content are required'];
         }
 
-        // Validate category
-        $validCategories = ['all', 'customer', 'fisherman', 'farmer', 'admin', 'government_ngo'];
-        if (!in_array($category, $validCategories)) {
-            $category = 'all';
-        }
-
         $data = [
             'title' => $title,
             'content' => $content,
-            'category' => $category,
             'created_by' => $_SESSION['user_id']
         ];
 
@@ -61,6 +49,7 @@ class NoticeController {
         $id = intval($_POST['notice_id'] ?? 0);
         $title = trim($_POST['title'] ?? '');
         $content = trim($_POST['content'] ?? '');
+        $category = trim($_POST['category'] ?? 'all');
 
         if (!$id || empty($title) || empty($content)) {
             return ['success' => false, 'message' => 'Invalid parameters'];
@@ -68,7 +57,8 @@ class NoticeController {
 
         $data = [
             'title' => $title,
-            'content' => $content
+            'content' => $content,
+            'category' => $category
         ];
 
         $result = $this->noticeModel->update($id, $data);
@@ -100,12 +90,8 @@ class NoticeController {
         ];
     }
 
-    public function getAll($userRole = null) {
-        // If no user role provided, try to get from session
-        if (!$userRole && isset($_SESSION['role'])) {
-            $userRole = $_SESSION['role'];
-        }
-        return $this->noticeModel->getAll($userRole);
+    public function getAll() {
+        return $this->noticeModel->getAll();
     }
 
     public function getById($id) {
@@ -115,24 +101,22 @@ class NoticeController {
 
 // Handle AJAX requests
 if (isset($_GET['action'])) {
+    session_start();
     header('Content-Type: application/json');
     $controller = new NoticeController();
 
     switch ($_GET['action']) {
         case 'create':
-            echo toon_encode($controller->create());
+            echo json_encode($controller->create());
             break;
         case 'update':
-            echo toon_encode($controller->update());
+            echo json_encode($controller->update());
             break;
         case 'delete':
-            echo toon_encode($controller->delete());
-            break;
-        case 'test':
-            echo toon_encode(['success' => true, 'message' => 'Controller is working', 'session' => ['user_id' => $_SESSION['user_id'] ?? 'not set', 'role' => $_SESSION['role'] ?? 'not set']]);
+            echo json_encode($controller->delete());
             break;
         default:
-            echo toon_encode(['success' => false, 'message' => 'Invalid action']);
+            echo json_encode(['success' => false, 'message' => 'Invalid action']);
     }
     exit;
 }

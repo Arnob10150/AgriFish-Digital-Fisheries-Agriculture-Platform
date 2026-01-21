@@ -21,7 +21,7 @@ if(isset($_SESSION['error'])){ $error = $_SESSION['error']; unset($_SESSION['err
         <div class="hero-pattern-2"></div>
         <div class="hero-content">
             <div class="hero-icon">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="logo-icon">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="logo-icon">
             </div>
             <h1 class="hero-title">
                 Digital Fisheries & <br/>

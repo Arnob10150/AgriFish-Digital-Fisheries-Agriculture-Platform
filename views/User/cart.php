@@ -7,28 +7,41 @@
     }
 
     $cart = $_SESSION['cart'] ?? [];
-    $products = [
-        'Ilish (Hilsa)' => 2400,
-        'Rui (River)' => 750,
-        'Katla (River)' => 750,
-        'Ayre (Giant Catfish)' => 1500,
-        'Chitol (Featherback)' => 1250,
-        'Boal (Wallago)' => 800,
-        'Shing (Stinging Catfish)' => 570,
-        'Pabda (Pabo Catfish)' => 450,
-        'Rupchanda (Pomfret)' => 1200,
-        'Koral (Seabass)' => 800,
-        'Tuna' => 500,
-        'Loitta (Bombay Duck)' => 350,
-        'Surma (King Fish)' => 600,
-        'Poa (Yellow Croaker)' => 550,
-        'Golda Chingri (Prawn)' => 1350,
-        'Bagda/Tiger Shrimp' => 1000,
-        'Lobster' => 2000,
-        'Crab (Mud/Blue)' => 700,
-        'Churi Shutki (Dried)' => 1200,
-        'Basa/Dory Fillet' => 580
-    ];
+
+    
+    try {
+        require_once '../../models/Product.php';
+        $productModel = new Product();
+        $dbProducts = $productModel->getAllActive();
+        $products = [];
+        foreach ($dbProducts as $prod) {
+            $products[$prod['name']] = $prod['price'];
+        }
+    } catch (Exception $e) {
+    
+        $products = [
+            'Ilish (Hilsa)' => 2400,
+            'Rui (River)' => 750,
+            'Katla (River)' => 750,
+            'Ayre (Giant Catfish)' => 1500,
+            'Chitol (Featherback)' => 1250,
+            'Boal (Wallago)' => 800,
+            'Shing (Stinging Catfish)' => 570,
+            'Pabda (Pabo Catfish)' => 450,
+            'Rupchanda (Pomfret)' => 1200,
+            'Koral (Seabass)' => 800,
+            'Tuna' => 500,
+            'Loitta (Bombay Duck)' => 350,
+            'Surma (King Fish)' => 600,
+            'Poa (Yellow Croaker)' => 550,
+            'Golda Chingri (Prawn)' => 1350,
+            'Bagda/Tiger Shrimp' => 1000,
+            'Lobster' => 2000,
+            'Crab (Mud/Blue)' => 700,
+            'Churi Shutki (Dried)' => 1200,
+            'Basa/Dory Fillet' => 580
+        ];
+    }
 
     $total = 0;
     foreach ($cart as $item) {
@@ -38,13 +51,13 @@
     }
 
     if (isset($_POST['checkout'])) {
-        // Generate bill
+        
         $_SESSION['bill'] = [
             'items' => $cart,
             'total' => $total,
             'date' => date('Y-m-d H:i:s')
         ];
-        $_SESSION['cart'] = []; // Clear cart
+        $_SESSION['cart'] = []; 
         header("Location: bill.php");
         exit;
     }
@@ -60,11 +73,11 @@
     <link rel="stylesheet" href="Css/cart.css">
 </head>
 <body>
-    <!-- Sidebar -->
+    
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle">Customer Portal</div>
         </div>
@@ -79,7 +92,7 @@
         </nav>
     </div>
 
-    <!-- Main Content -->
+   
     <div class="main-content">
         <div class="dashboard-header">
             <div>

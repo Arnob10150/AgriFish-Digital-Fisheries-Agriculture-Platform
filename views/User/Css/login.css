@@ -1,6 +1,4 @@
-/* Login-specific styles - extends main style.css */
 
-/* Additional login form enhancements */
 .auth-form .form-input {
     font-size: 1rem;
     padding: 0.875rem 1rem;
@@ -11,7 +9,7 @@
     transition: transform 0.2s ease;
 }
 
-/* Language selector styling */
+
 .language-selector {
     position: absolute;
     top: 1rem;
@@ -100,7 +98,7 @@
     to { transform: translateY(0); opacity: 1; }
 }
 
-/* Mobile optimizations */
+
 @media (max-width: 640px) {
     .auth-container {
         max-width: 100%;

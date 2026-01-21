@@ -63,7 +63,7 @@
                             <input type="radio" id="farmer" name="role" value="farmer" required>
                             <label for="farmer" class="role-card-content">
                                 <div class="role-icon">
-                                    <img src="/DFAP/storage/resources/images/icon/icon.png" alt="Fish Farmer" class="role-icon-img">
+                                    <img src="../storage/resources/images/icon/icon.png" alt="Fish Farmer" class="role-icon-img">
                                 </div>
                                 <div class="role-info">
                                     <h3 class="role-title">Fish Farmer</h3>

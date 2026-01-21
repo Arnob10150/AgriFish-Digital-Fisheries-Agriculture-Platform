@@ -9,8 +9,16 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'customer') {
 if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
 if (!isset($_SESSION['wishlist'])) $_SESSION['wishlist'] = [];
 
-// For demo purposes, show cart items as "orders"
-$orders = $_SESSION['cart'] ?? [];
+// Load order history from database
+try {
+    require_once '../../models/database.php';
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT product_name, quantity, price, order_date FROM orders WHERE user_id = ? ORDER BY order_date DESC");
+    $stmt->execute([$_SESSION['user_id']]);
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $orders = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,7 +34,7 @@ $orders = $_SESSION['cart'] ?? [];
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle">Buyer Portal</div>
         </div>
@@ -61,27 +69,25 @@ $orders = $_SESSION['cart'] ?? [];
         <?php else: ?>
             <div class="data-table">
                 <div class="table-header">
-                    <h2 class="table-title">Your Orders (<?php echo count($orders); ?>)</h2>
+                    <h2 class="table-title">Order History (<?php echo count($orders); ?>)</h2>
                 </div>
                 <div class="table-content">
                     <table>
                         <thead>
                             <tr>
                                 <th>Product</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Order Date</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($orders as $order): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($order); ?></td>
-                                <td><span class="status-badge">Processing</span></td>
-                                <td><?php echo date('M j, Y'); ?></td>
-                                <td>
-                                    <button class="btn-outline">Track Order</button>
-                                </td>
+                                <td><?php echo htmlspecialchars($order['product_name']); ?></td>
+                                <td><?php echo htmlspecialchars($order['quantity']); ?></td>
+                                <td>৳<?php echo number_format($order['price'], 2); ?></td>
+                                <td><?php echo date('M j, Y', strtotime($order['order_date'])); ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>

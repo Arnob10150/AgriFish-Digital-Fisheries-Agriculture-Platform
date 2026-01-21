@@ -5,7 +5,7 @@
         header("Location:../home.php");
         exit;
     }
-
+ require_once __DIR__ . '/../../config.php';
     // Load notices
     try {
         require_once __DIR__ . '/../../controllers/NoticeController.php';
@@ -30,7 +30,7 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="<?php echo IMAGE_BASE_PATH; ?>icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle">Farmer Portal</div>
         </div>

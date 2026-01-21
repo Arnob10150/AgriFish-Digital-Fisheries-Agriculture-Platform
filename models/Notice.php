@@ -65,7 +65,7 @@ class Notice {
             return $stmt->execute([
                 $data['title'],
                 $data['content'],
-                $data['category'] ?? 'all',
+                $data['category'] ?? 'customer',
                 $data['created_by']
             ]);
         } catch (PDOException $e) {
@@ -77,12 +77,14 @@ class Notice {
         if (!$this->pdo) return false;
 
         try {
-            $stmt = $this->pdo->prepare("UPDATE notices SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE notice_id = ?");
-            return $stmt->execute([
+            $stmt = $this->pdo->prepare("UPDATE notices SET title = ?, content = ?, category = ?, updated_at = CURRENT_TIMESTAMP WHERE notice_id = ?");
+            $stmt->execute([
                 $data['title'],
                 $data['content'],
+                $data['category'] ?? 'customer',
                 $id
             ]);
+            return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             return false;
         }
@@ -93,7 +95,8 @@ class Notice {
 
         try {
             $stmt = $this->pdo->prepare("DELETE FROM notices WHERE notice_id = ?");
-            return $stmt->execute([$id]);
+            $stmt->execute([$id]);
+            return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             return false;
         }

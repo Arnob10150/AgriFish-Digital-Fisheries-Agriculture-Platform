@@ -81,7 +81,7 @@ try {
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
                 <span>DFAP</span>
             </div>
             <div class="sidebar-subtitle">Admin Portal</div>
@@ -130,11 +130,16 @@ try {
                         <tr>
                             <td><?php echo $product['product_id']; ?></td>
                             <td>
-                                <img src="<?php echo htmlspecialchars($product['image']); ?>"
-                                     alt="Product"
-                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                                <span style="display: none;"><?php echo $product['image'] ?? '🐟'; ?></span>
+                                <?php $image = $product['image'] ?? '🐟'; ?>
+                                <?php if (filter_var($image, FILTER_VALIDATE_URL) || strpos($image, '/') === 0): ?>
+                                    <img src="<?php echo htmlspecialchars($image); ?>"
+                                         alt="Product"
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                                    <span style="display: none;"><?php echo htmlspecialchars($image); ?></span>
+                                <?php else: ?>
+                                    <span><?php echo htmlspecialchars($image); ?></span>
+                                <?php endif; ?>
                             </td>
                             <td><?php echo htmlspecialchars($product['name']); ?></td>
                             <td><?php echo htmlspecialchars($product['category']); ?></td>
@@ -188,11 +193,16 @@ try {
                     <tr>
                         <td><?php echo $product['product_id']; ?></td>
                         <td>
-                            <img src="<?php echo htmlspecialchars($product['image']); ?>"
-                                 alt="Product"
-                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                            <span style="display: none;"><?php echo $product['image'] ?? '🐟'; ?></span>
+                            <?php $image = $product['image'] ?? '🐟'; ?>
+                            <?php if (filter_var($image, FILTER_VALIDATE_URL) || strpos($image, '/') === 0): ?>
+                                <img src="<?php echo htmlspecialchars($image); ?>"
+                                     alt="Product"
+                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                                <span style="display: none;"><?php echo htmlspecialchars($image); ?></span>
+                            <?php else: ?>
+                                <span><?php echo htmlspecialchars($image); ?></span>
+                            <?php endif; ?>
                         </td>
                         <td><?php echo htmlspecialchars($product['name']); ?></td>
                         <td><?php echo htmlspecialchars($product['seller_name']); ?></td>
@@ -379,5 +389,6 @@ try {
             min-height: 80px;
         }
     </style>
+    <script src="js/Script.js"></script>
 </body>
 </html>

@@ -43,7 +43,6 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Hero Section */
 .hero-section {
   display: none;
   position: relative;
@@ -375,7 +374,7 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: underline;
 }
 
-/* Product list */
+
 ul {
   list-style: none;
   padding: 0;
@@ -492,7 +491,6 @@ li button {
   font-weight: 500;
 }
 
-/* Modal styles for upload-product.php */
 .modal {
   position: fixed;
   z-index: 1000;

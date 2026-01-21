@@ -28,7 +28,7 @@ try {
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle"><?php echo ucfirst($_SESSION['role']); ?> Portal</div>
         </div>

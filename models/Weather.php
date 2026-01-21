@@ -1,17 +1,12 @@
 <?php
-/**
- * Weather Model for DFAP
- * Fetches weather data from Open-Meteo API
- */
+
 
 class Weather {
     private $apiUrl = 'https://api.open-meteo.com/v1/forecast';
 
-    /**
-     * Get weather data for a specific location
-     */
+    
     public function getWeatherData($latitude, $longitude, $locationName = '') {
-        // Default to Chittagong, Bangladesh for fisherman dashboard
+
         $lat = $latitude ?: 22.3569;
         $lon = $longitude ?: 91.7832;
         $location = $locationName ?: 'Chittagong Coast';
@@ -30,7 +25,7 @@ class Weather {
         try {
             $context = stream_context_create([
                 'http' => [
-                    'timeout' => 10, // 10 second timeout
+                    'timeout' => 10, 
                     'user_agent' => 'DFAP-Weather/1.0'
                 ]
             ]);
@@ -54,17 +49,15 @@ class Weather {
         }
     }
 
-    /**
-     * Format API response into usable data
-     */
+
     private function formatWeatherData($data, $location) {
         $current = $data['current'];
         $hourly = $data['hourly'];
 
-        // Get weather description from WMO code
+       
         $weatherDesc = $this->getWeatherDescription($current['weather_code']);
 
-        // Check for alerts (high winds, etc.)
+      
         $alerts = $this->checkForAlerts($hourly);
 
         return [
@@ -80,9 +73,7 @@ class Weather {
         ];
     }
 
-    /**
-     * Get weather description from WMO weather code
-     */
+   
     private function getWeatherDescription($code) {
         $descriptions = [
             0 => 'Clear sky',
@@ -114,9 +105,6 @@ class Weather {
         return $descriptions[$code] ?? 'Unknown';
     }
 
-    /**
-     * Check for weather alerts
-     */
     private function checkForAlerts($hourly) {
         $alerts = [];
 
@@ -128,7 +116,7 @@ class Weather {
         }
 
         if (isset($hourly['weather_code'])) {
-            $severeCodes = [95, 96, 99, 65, 82, 86]; // Thunderstorm, heavy rain, heavy snow
+            $severeCodes = [95, 96, 99, 65, 82, 86]; 
             foreach ($hourly['weather_code'] as $code) {
                 if (in_array($code, $severeCodes)) {
                     $alerts[] = 'Severe weather conditions expected';
@@ -140,9 +128,7 @@ class Weather {
         return $alerts;
     }
 
-    /**
-     * Get simplified hourly forecast
-     */
+  
     private function getHourlyForecast($hourly) {
         $forecast = [];
 
@@ -160,9 +146,7 @@ class Weather {
         return $forecast;
     }
 
-    /**
-     * Fallback data when API is unavailable
-     */
+ 
     private function getFallbackData($location) {
         return [
             'location' => $location,
@@ -184,9 +168,7 @@ class Weather {
         ];
     }
 
-    /**
-     * Get weather for major Bangladeshi fishing locations
-     */
+   
     public function getFishingLocations() {
         return [
             'chittagong' => ['name' => 'Chittagong Coast', 'lat' => 22.3569, 'lon' => 91.7832],

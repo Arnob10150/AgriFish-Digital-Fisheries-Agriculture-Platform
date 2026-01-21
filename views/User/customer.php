@@ -1,16 +1,17 @@
 <?php
     session_start();
+    require_once __DIR__ . '/../../config.php';
     if(!isset($_SESSION["user_id"]) || $_SESSION["role"] != "customer")
     {
         header("Location:../home.php");
         exit;
     }
 
-    // Initialize cart and wishlist
+  
     if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
     if (!isset($_SESSION['wishlist'])) $_SESSION['wishlist'] = [];
 
-    // Handle add to cart/wishlist
+   
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $action = $_POST['action'] ?? '';
         $product = $_POST['product'] ?? '';
@@ -26,23 +27,23 @@
         }
     }
 
-    // Load products from database or use demo data
+   
     try {
         require_once '../../models/Product.php';
         $productModel = new Product();
         $products = $productModel->getAllActive();
 
-        // If no products in database, use demo data
+       
         if (empty($products)) {
             $products = $productModel->getDemoProducts();
         }
     } catch (Exception $e) {
-        // Show error if database connection fails
+       
         $products = [];
         $error_message = "Unable to load products. Please try again later.";
     }
 
-    // Load notices
+  
     try {
         require_once __DIR__ . '/../../controllers/NoticeController.php';
         $noticeController = new NoticeController();
@@ -62,11 +63,11 @@
     <link rel="stylesheet" href="Css/customer.css">
 </head>
 <body>
-    <!-- Sidebar -->
+    
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="<?php echo IMAGE_BASE_PATH; ?>icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle">Buyer Portal</div>
         </div>
@@ -81,7 +82,7 @@
         </nav>
     </div>
 
-    <!-- Main Content -->
+
     <div class="main-content">
         <div class="dashboard-header">
             <div>
@@ -106,7 +107,7 @@
             </div>
         <?php endif; ?>
 
-        <!-- Notices -->
+      
         <?php if (!empty($notices)): ?>
         <div class="notices-section">
             <h2 class="section-title">📢 Important Notices</h2>
@@ -129,7 +130,7 @@
         </div>
         <?php endif; ?>
 
-        <!-- Categories -->
+    
         <div class="categories">
             <button class="category-btn active">All</button>
             <button class="category-btn">Sea Fish</button>
@@ -139,16 +140,25 @@
             <button class="category-btn">Frozen</button>
         </div>
 
-        <!-- Product Grid -->
+     
         <div class="product-grid">
             <?php foreach ($products as $product): ?>
             <div class="product-card">
                 <div class="product-image">
-                    <img src="<?php echo htmlspecialchars($product['image']); ?>"
-                         alt="<?php echo htmlspecialchars($product['name']); ?>"
-                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo $product['image'] ?? '🐟'; ?></div>
+                    <?php $image = $product['image'] ?? '🐟'; ?>
+                    <?php if (filter_var($image, FILTER_VALIDATE_URL)): ?>
+                        <img src="<?php echo htmlspecialchars($image); ?>"
+                             alt="<?php echo htmlspecialchars($product['name']); ?>"
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo htmlspecialchars($image); ?></div>
+                    <?php else: ?>
+                        <img src="<?php echo htmlspecialchars(IMAGE_BASE_PATH . $image); ?>"
+                             alt="<?php echo htmlspecialchars($product['name']); ?>"
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo htmlspecialchars($image); ?></div>
+                    <?php endif; ?>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
@@ -187,13 +197,13 @@
     </div>
 
     <script>
-        // Get DOM elements
+    
         const categoryBtns = document.querySelectorAll('.category-btn');
         const productCards = document.querySelectorAll('.product-card');
         const searchInput = document.querySelector('.search-input');
         const addToCartBtns = document.querySelectorAll('.add-cart-btn');
 
-        // Category filtering
+      
         categoryBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 categoryBtns.forEach(b => b.classList.remove('active'));

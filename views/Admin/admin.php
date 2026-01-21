@@ -23,14 +23,13 @@
     <title>Admin Console - DFAP</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <script src="Script.js"></script>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
                 <span>DFAP</span>
             </div>
             <div class="sidebar-subtitle">Admin Portal</div>

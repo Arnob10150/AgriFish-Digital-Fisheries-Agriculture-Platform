@@ -19,7 +19,7 @@ if(!isset($_SESSION["user_id"])) {
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle"><?php echo ucfirst($_SESSION['role']); ?> Portal</div>
         </div>
@@ -83,7 +83,7 @@ if(!isset($_SESSION["user_id"])) {
             <div class="profile-avatar">
                 <div class="avatar-circle">
                     <?php if (!empty($_SESSION['profile_picture'])): ?>
-                        <img src="/DFAP/storage/resources/images/profiles/<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>"
+                        <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/profiles/<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>"
                              alt="Profile Picture" class="avatar-image">
                     <?php else: ?>
                         <?php echo strtoupper(substr($_SESSION['user_name'], 0, 1)); ?>

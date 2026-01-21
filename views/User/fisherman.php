@@ -5,7 +5,7 @@
         header("Location:../home.php");
         exit;
     }
-
+require_once __DIR__ . '/../../config.php';
     // Load notices
     try {
         require_once __DIR__ . '/../../controllers/NoticeController.php';
@@ -13,6 +13,15 @@
         $notices = $noticeController->getAll();
     } catch (Exception $e) {
         $notices = [];
+    }
+
+    // Load catches
+    try {
+        require_once __DIR__ . '/../../controllers/CatchController.php';
+        $catchController = new CatchController();
+        $catches = $catchController->getAllByUser();
+    } catch (Exception $e) {
+        $catches = [];
     }
 
     // Default weather data (will be updated by JavaScript)
@@ -39,7 +48,7 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="<?php echo IMAGE_BASE_PATH; ?>icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle">Fisherman Portal</div>
         </div>
@@ -92,7 +101,7 @@
                     <div class="sensor-title">Total Catch</div>
                     <div class="sensor-icon blue">⚖️</div>
                 </div>
-                <div class="sensor-value">1,240 kg</div>
+                <div class="sensor-value" style="color: white;">1,240 kg</div>
                 <div class="sensor-subtitle">+12% from last week</div>
             </div>
 
@@ -101,7 +110,7 @@
                     <div class="sensor-title">Earnings</div>
                     <div class="sensor-icon green">💰</div>
                 </div>
-                <div class="sensor-value">৳4,250</div>
+                <div class="sensor-value" style="color: white;">৳4,250</div>
                 <div class="sensor-subtitle">+8% from last week</div>
             </div>
         </div>
@@ -127,39 +136,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr data-id="1">
-                                <td>Oct 21, 2024</td>
-                                <td>Hilsa Fish</td>
-                                <td>120 kg</td>
-                                <td>৳387</td>
-                                <td class="text-right">৳46,440</td>
+                            <?php foreach ($catches as $catch): ?>
+                            <tr data-id="<?php echo $catch['catch_id']; ?>">
+                                <td><?php echo date('M j, Y', strtotime($catch['catch_date'])); ?></td>
+                                <td><?php echo htmlspecialchars($catch['fish_type']); ?></td>
+                                <td><?php echo htmlspecialchars($catch['weight_kg']); ?> kg</td>
+                                <td>৳<?php echo htmlspecialchars($catch['price_per_kg']); ?></td>
+                                <td class="text-right">৳<?php echo number_format($catch['weight_kg'] * $catch['price_per_kg'], 2); ?></td>
                                 <td class="text-right">
                                     <button class="btn-outline" onclick="editCatch(this)">Edit</button>
                                     <button class="btn-danger" onclick="deleteCatch(this)">Delete</button>
                                 </td>
                             </tr>
-                            <tr data-id="2">
-                                <td>Oct 22, 2024</td>
-                                <td>Tiger Prawns</td>
-                                <td>85 kg</td>
-                                <td>৳1530</td>
-                                <td class="text-right">৳130,050</td>
-                                <td class="text-right">
-                                    <button class="btn-outline" onclick="editCatch(this)">Edit</button>
-                                    <button class="btn-danger" onclick="deleteCatch(this)">Delete</button>
-                                </td>
-                            </tr>
-                            <tr data-id="3">
-                                <td>Oct 23, 2024</td>
-                                <td>Rui Fish</td>
-                                <td>95 kg</td>
-                                <td>৳530</td>
-                                <td class="text-right">৳50,350</td>
-                                <td class="text-right">
-                                    <button class="btn-outline" onclick="editCatch(this)">Edit</button>
-                                    <button class="btn-danger" onclick="deleteCatch(this)">Delete</button>
-                                </td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -392,8 +381,6 @@
         const catchModal = document.getElementById('catch-modal');
         const catchModalTitle = document.getElementById('catch-modal-title');
         const catchForm = document.getElementById('catch-form');
-        const catchesTableBody = document.querySelector('#catches-table tbody');
-        let nextCatchId = 4; // To simulate auto-incrementing IDs for new entries
 
         function openCatchModal(title = 'Add Catch') {
             catchForm.reset();
@@ -428,45 +415,53 @@
 
         function deleteCatch(button) {
             if (confirm('Are you sure you want to delete this catch?')) {
-                button.closest('tr').remove();
+                const row = button.closest('tr');
+                const id = row.dataset.id;
+                const formData = new FormData();
+                formData.append('catch_id', id);
+                fetch('../../controllers/CatchController.php?action=delete', {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error deleting catch');
+                });
             }
         }
 
         catchForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            const formData = new FormData(this);
             const id = document.getElementById('catch-id').value;
-            const date = new Date(document.getElementById('catch-date').value);
-            const type = document.getElementById('catch-type').value;
-            const weight = parseFloat(document.getElementById('catch-weight').value);
-            const price = parseFloat(document.getElementById('catch-price').value);
-
-            const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const totalAmount = (weight * price).toLocaleString('en-IN', { style: 'currency', currency: 'BDT', minimumFractionDigits: 2 }).replace('BDT', '৳');
-
-            if (id) {
-                // Update
-                const row = document.querySelector(`#catches-table tr[data-id='${id}']`);
-                row.cells[0].textContent = formattedDate;
-                row.cells[1].textContent = type;
-                row.cells[2].textContent = `${weight} kg`;
-                row.cells[3].textContent = `৳${price}`;
-                row.cells[4].textContent = totalAmount;
-            } else {
-                // Add
-                const newRow = catchesTableBody.insertRow();
-                newRow.dataset.id = nextCatchId++;
-                newRow.innerHTML = `
-                    <td>${formattedDate}</td>
-                    <td>${type}</td>
-                    <td>${weight} kg</td>
-                    <td>৳${price}</td>
-                    <td class="text-right">${totalAmount}</td>
-                    <td class="text-right">
-                        <button class="btn-outline" onclick="editCatch(this)">Edit</button>
-                        <button class="btn-danger" onclick="deleteCatch(this)">Delete</button>
-                    </td>
-                `;
+            const action = id ? 'update' : 'create';
+            if (action === 'update') {
+                formData.append('catch_id', id);
             }
+            fetch('../../controllers/CatchController.php?action=' + action, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error saving catch');
+            });
             closeCatchModal();
         });
 

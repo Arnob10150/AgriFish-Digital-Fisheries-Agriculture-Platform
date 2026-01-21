@@ -1,11 +1,11 @@
 <?php
 session_start();
-header('Content-Type: application/toon');
+header('Content-Type: application/json');
 
 require_once '../../models/toon.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    echo toon_encode(['success' => false, 'message' => 'Unauthorized']);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit;
 }
 
@@ -18,7 +18,7 @@ $userId = intval($_POST['user_id'] ?? 0);
 $action = $_POST['action'] ?? '';
 
 if (!$userId || !in_array($action, ['approve', 'reject'])) {
-    echo toon_encode(['success' => false, 'message' => 'Invalid parameters']);
+    echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
     exit;
 }
 
@@ -34,9 +34,9 @@ try {
         $message = $result ? 'User rejected successfully' : 'Failed to reject user';
     }
 
-    echo toon_encode(['success' => $result, 'message' => $message]);
+    echo json_encode(['success' => $result, 'message' => $message]);
 
 } catch (Exception $e) {
-    echo toon_encode(['success' => true, 'message' => 'Action completed (demo mode)']);
+    echo json_encode(['success' => true, 'message' => 'Action completed (demo mode)']);
 }
 ?>

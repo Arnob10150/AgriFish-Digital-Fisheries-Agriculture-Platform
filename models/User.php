@@ -27,6 +27,40 @@ class User {
         return $stmt->fetch();
     }
 
+    public function login($email, $password) {
+        if (!$this->db) return false;
+
+        $user = $this->findByEmail($email);
+        if (!$user) return false;
+
+        if (!password_verify($password, $user['password'])) return false;
+
+        if ($user['account_status'] !== 'active') return false;
+
+        // Set session
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['user_name'] = $user['full_name'];
+
+        return true;
+    }
+
+    public function findByUsername($username) {
+        if (!$this->db) return null;
+
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        return $stmt->fetch();
+    }
+
+    public function findByNid($nid) {
+        if (!$this->db) return null;
+
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE nid = ?");
+        $stmt->execute([$nid]);
+        return $stmt->fetch();
+    }
+
     public function findByName($name) {
         if (!$this->db) return null;
 
@@ -39,10 +73,11 @@ class User {
         if (!$this->db) return false;
 
         $stmt = $this->db->prepare("
-            INSERT INTO users (email, password, mobile_number, nid, full_name, role, location, language_preference, is_verified, account_status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users (username, email, password, mobile_number, nid, full_name, role, location, language_preference, is_verified, account_status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         return $stmt->execute([
+            $data['username'] ?? null,
             $data['email'] ?? null,
             $data['password'] ?? null,
             $data['mobile_number'] ?? null,
@@ -172,7 +207,7 @@ class User {
     public function getPendingUsers() {
         if (!$this->db) return [];
 
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE is_verified = FALSE AND account_status = 'pending' ORDER BY created_at DESC");
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE account_status = 'pending' ORDER BY created_at DESC");
         $stmt->execute();
         return $stmt->fetchAll();
     }

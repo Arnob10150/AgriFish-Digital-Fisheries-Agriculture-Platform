@@ -1,8 +1,5 @@
 <?php
-/**
- * Weather Controller for DFAP
- * Handles weather data requests and API responses
- */
+
 
 require_once '../models/Weather.php';
 require_once '../models/toon.php';
@@ -14,25 +11,19 @@ class WeatherController {
         $this->weatherModel = new Weather();
     }
 
-    /**
-     * Get weather data for dashboard display
-     */
+   
     public function getDashboardWeather() {
-        // Default to Chittagong for fisherman dashboard
+       
         $weatherData = $this->weatherModel->getWeatherData(22.3569, 91.7832, 'Chittagong Coast');
         return $weatherData;
     }
 
-    /**
-     * Get weather data for a specific location
-     */
+   
     public function getLocationWeather($latitude, $longitude, $locationName = '') {
         return $this->weatherModel->getWeatherData($latitude, $longitude, $locationName);
     }
 
-    /**
-     * API endpoint for AJAX weather requests
-     */
+    
     public function apiGetWeather() {
         header('Content-Type: application/json');
 
@@ -52,9 +43,7 @@ class WeatherController {
         echo toon_encode($weatherData);
     }
 
-    /**
-     * Get weather for all fishing locations
-     */
+  
     public function getAllFishingLocationsWeather() {
         $locations = $this->weatherModel->getFishingLocations();
         $weatherData = [];
@@ -65,16 +54,14 @@ class WeatherController {
                 $location['lon'],
                 $location['name']
             );
-            // Add a small delay to avoid overwhelming the API
-            usleep(100000); // 0.1 seconds
+           
+            usleep(100000); 
         }
 
         return $weatherData;
     }
 
-    /**
-     * Check if weather conditions are safe for fishing
-     */
+   
     public function checkFishingConditions($weatherData) {
         $conditions = [
             'safe' => true,
@@ -82,21 +69,20 @@ class WeatherController {
             'recommendations' => []
         ];
 
-        // Wind speed check
+        
         if ($weatherData['wind_speed'] > 15) {
             $conditions['safe'] = false;
             $conditions['warnings'][] = 'High wind speeds may be dangerous';
             $conditions['recommendations'][] = 'Consider postponing fishing trip';
         }
 
-        // Temperature check
         if ($weatherData['temperature'] < 15) {
             $conditions['warnings'][] = 'Cold weather conditions';
             $conditions['recommendations'][] = 'Wear appropriate warm clothing';
         }
 
-        // Weather code check for severe conditions
-        $severeCodes = [95, 96, 99, 65, 82, 86]; // Thunderstorm, heavy rain, heavy snow
+        
+        $severeCodes = [95, 96, 99, 65, 82, 86]; 
         if (isset($weatherData['current_weather_code']) &&
             in_array($weatherData['current_weather_code'], $severeCodes)) {
             $conditions['safe'] = false;
@@ -104,7 +90,7 @@ class WeatherController {
             $conditions['recommendations'][] = 'Stay ashore and monitor weather updates';
         }
 
-        // Check alerts
+        
         if (!empty($weatherData['alerts'])) {
             $conditions['safe'] = false;
             $conditions['warnings'] = array_merge($conditions['warnings'], $weatherData['alerts']);
@@ -113,9 +99,7 @@ class WeatherController {
         return $conditions;
     }
 
-    /**
-     * Format weather data for display
-     */
+   
     public function formatWeatherForDisplay($weatherData) {
         return [
             'location' => $weatherData['location'],
@@ -129,12 +113,10 @@ class WeatherController {
         ];
     }
 
-    /**
-     * Cache weather data to reduce API calls
-     */
+   
     private $cache = [];
 
-    public function getCachedWeather($lat, $lon, $cacheTime = 1800) { // 30 minutes cache
+    public function getCachedWeather($lat, $lon, $cacheTime = 1800) { 
         $cacheKey = $lat . ',' . $lon;
 
         if (isset($this->cache[$cacheKey]) &&

@@ -92,8 +92,23 @@
         </div>
     </div>
 
+    <?php
+    
+    try {
+        require_once '../../models/database.php';
+        $pdo = getDB();
+        foreach ($bill['items'] as $item) {
+            $price = $products[$item] ?? 0;
+            $stmt = $pdo->prepare("INSERT INTO orders (user_id, product_name, quantity, price) VALUES (?, ?, 1, ?)");
+            $stmt->execute([$_SESSION['user_id'], $item, $price]);
+        }
+    } catch (Exception $e) {
+        
+    }
+    ?>
+
     <script>
-        // Auto-print on mobile or redirect
+   
         if (window.innerWidth < 768) {
             setTimeout(() => {
                 window.print();

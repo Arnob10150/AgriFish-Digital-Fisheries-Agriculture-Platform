@@ -18,14 +18,14 @@
     <title>Notice Management - DFAP</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <script src="Script.js"></script>
+    <script src="js/Script.js"></script>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon">
                 <span>DFAP</span>
             </div>
             <div class="sidebar-subtitle">Admin Portal</div>
@@ -79,8 +79,8 @@
                             <tr>
                                 <td style="font-weight: 500;"><?php echo htmlspecialchars($notice['title']); ?></td>
                                 <td>
-                                    <span class="category-badge category-<?php echo htmlspecialchars($notice['category']); ?>">
-                                        <?php echo ucfirst(htmlspecialchars($notice['category'])); ?>
+                                    <span class="category-badge category-<?php echo htmlspecialchars($notice['category'] ?? 'all'); ?>">
+                                        <?php echo ucfirst(htmlspecialchars($notice['category'] ?? 'all')); ?>
                                     </span>
                                 </td>
                                 <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b;">
@@ -89,7 +89,7 @@
                                 <td><?php echo htmlspecialchars($notice['creator_name']); ?></td>
                                 <td style="color: #64748b;"><?php echo date('M j, Y H:i', strtotime($notice['created_at'])); ?></td>
                                 <td class="text-right">
-                                    <button class="btn-outline" onclick="editNotice(<?php echo $notice['notice_id']; ?>, '<?php echo addslashes($notice['title']); ?>', '<?php echo addslashes($notice['content']); ?>', '<?php echo addslashes($notice['category']); ?>')">Edit</button>
+                                    <button class="btn-outline" onclick="editNotice(<?php echo $notice['notice_id']; ?>, '<?php echo addslashes($notice['title']); ?>', '<?php echo addslashes($notice['content']); ?>', '<?php echo addslashes($notice['category'] ?? 'all'); ?>')">Edit</button>
                                     <button class="btn-danger" onclick="deleteNotice(<?php echo $notice['notice_id']; ?>)">Delete</button>
                                 </td>
                             </tr>
@@ -162,12 +162,12 @@
 
         function deleteNotice(id) {
             if (confirm('Are you sure you want to delete this notice?')) {
+                const formData = new FormData();
+                formData.append('notice_id', id);
                 fetch('../../controllers/NoticeController.php?action=delete', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'notice_id=' + id
+                    credentials: 'include',
+                    body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -189,6 +189,7 @@
 
             fetch('../../controllers/NoticeController.php?action=' + action, {
                 method: 'POST',
+                credentials: 'include',
                 body: formData
             })
             .then(response => response.json())

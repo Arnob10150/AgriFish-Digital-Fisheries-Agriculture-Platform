@@ -2,6 +2,6 @@
 session_start();
 session_unset();
 session_destroy();
-header("Location: /DFAP/customer/views/login.php");
+header("Location: ../views/User/login.php");
 exit;
 ?>

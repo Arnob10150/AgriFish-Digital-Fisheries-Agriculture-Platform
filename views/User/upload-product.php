@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../config.php';
 if(!isset($_SESSION["user_id"])) {
     header("Location:../home.php");
     exit;
@@ -79,7 +80,7 @@ try {
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle"><?php echo ucfirst($_SESSION['role']); ?> Portal</div>
         </div>
@@ -202,7 +203,7 @@ try {
                     </div>
                     <div class="form-group">
                         <label for="image" class="form-label">Image (Emoji or URL)</label>
-                        <input type="text" id="image" name="image" class="form-input" placeholder="🐟">
+                        <input type="text" id="image" name="image" class="form-input" placeholder="<?php echo IMAGE_BASE_PATH; ?>fish/... or 🐟">
                     </div>
                     <div class="form-group">
                         <label for="stock_quantity" class="form-label">Stock Quantity</label>

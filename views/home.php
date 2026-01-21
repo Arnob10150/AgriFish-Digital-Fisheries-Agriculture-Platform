@@ -22,21 +22,15 @@ $err_invalid = "";
 $has_error = false;
 
 
-$full_name = "";
-$err_name = "";
-$reg_email = "";
-$err_reg_email = "";
-$reg_password = "";
-$reg_confirm_password = "";
-$err_reg_confirm_password = "";
-$phone_number = "";
-$err_phone = "";
-$nid = "";
-$err_nid = "";
-$err_reg_password = "";
 $role = "";
-$err_role = "";
-$reg_has_error = false;
+
+$full_name = "";
+$reg_email = "";
+$reg_password = "";
+$confirm_password = "";
+$phone_number = "";
+$nid = "";
+$field_errors = [];
 
 if (isset($_POST['submit'])) {
 
@@ -65,7 +59,14 @@ if (isset($_POST['submit'])) {
         if (isset($demoUsers[$email]) && $demoUsers[$email]['password'] === $password) {
 
             $user = $demoUsers[$email];
-            $_SESSION['user_id'] = rand(1000, 9999);
+            // Use fixed IDs to match database
+            $fixedIds = [
+                'admin@dfap.com' => 1,
+                'farmer@dfap.com' => 5,
+                'fisherman@dfap.com' => 4,
+                'customer@dfap.com' => 3
+            ];
+            $_SESSION['user_id'] = $fixedIds[$email] ?? rand(1000, 9999);
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_phone'] = '+880' . rand(100000000, 999999999);
@@ -134,96 +135,6 @@ if (isset($_POST['submit'])) {
 }
 
 
-if (isset($_POST['register'])) {
-    if (empty($_POST['reg_email'])) {
-        $err_reg_email = "*Email Required";
-        $reg_has_error = true;
-    } else {
-        $reg_email = $_POST['reg_email'];
-    }
-    if (empty($_POST['reg_password'])) {
-        $err_reg_password = "*Password Required";
-        $reg_has_error = true;
-    } else {
-        $reg_password = $_POST['reg_password'];
-    }
-    if (empty($_POST['confirm_password'])) {
-        $err_reg_confirm_password = "*Confirm Password Required";
-        $reg_has_error = true;
-    } elseif ($_POST['confirm_password'] !== $_POST['reg_password']) {
-        $err_reg_confirm_password = "*Passwords do not match";
-        $reg_has_error = true;
-    }
-    if (empty($_POST['phone_number'])) {
-        $err_phone = "*Phone Number Required";
-        $reg_has_error = true;
-    } else {
-        $phone_number = $_POST['phone_number'];
-    }
-    if (empty($_POST['nid'])) {
-        $err_nid = "*NID Required";
-        $reg_has_error = true;
-    } else {
-        $nid = $_POST['nid'];
-    }
-    if (empty($_POST['full_name'])) {
-        $err_name = "*Full Name Required";
-        $reg_has_error = true;
-    } else {
-        $full_name = $_POST['full_name'];
-    }
-    if (empty($_POST['role'])) {
-        $err_role = "*Role Required";
-        $reg_has_error = true;
-    } else {
-        $role = $_POST['role'];
-    }
-
-    if (!$reg_has_error) {
-
-        try {
-            require_once '../models/User.php';
-            $userModel = new User();
-
-            // Check if name already exists
-            if ($userModel->findByName($full_name)) {
-                $reg_has_error = true;
-                $err_name = "This name is already taken. Please choose a different name.";
-            } else {
-
-                $hashedPassword = password_hash($reg_password, PASSWORD_DEFAULT);
-
-                $userData = [
-                    'email' => $reg_email,
-                    'password' => $hashedPassword,
-                    'full_name' => $full_name,
-                    'mobile_number' => $phone_number,
-                    'nid' => $nid,
-                    'role' => $role,
-                    'is_verified' => false,
-                    'account_status' => 'pending'
-                ];
-
-                if ($userModel->create($userData)) {
-                    $_SESSION['signup_complete'] = true;
-                    $_SESSION['signup_message'] = 'Registration submitted successfully! Your account is pending admin verification. You will be notified once approved.';
-                    header("Location: home.php?signup=1");
-                    exit;
-                } else {
-                    $reg_has_error = true;
-                    $err_reg_email = "Database error: Could not save user. Please check database connection.";
-                }
-            }
-        } catch (Exception $e) {
-
-            $_SESSION['recent_signup_email'] = $reg_email;
-            $_SESSION['signup_complete'] = true;
-            $_SESSION['signup_message'] = 'Registration submitted successfully! Your account is pending admin verification. You will be notified once approved.';
-            header("Location: home.php?signup=1");
-            exit;
-        }
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -240,18 +151,18 @@ if (isset($_POST['register'])) {
         <div class="hero-section">
             <div class="slideshow-background">
                 <!-- Slideshow images from your directory -->
-                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/1.jpg');"></div>
-                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/2.jpg');"></div>
-                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/3.jpg');"></div>
-                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/4.jpg');"></div>
-                <div class="slide" style="background-image: url('/DFAP/storage/resources/images/home/5.jpg');"></div>
+                <div class="slide" style="background-image: url('../storage/resources/images/home/1.jpg');"></div>
+                <div class="slide" style="background-image: url('../storage/resources/images/home/2.jpg');"></div>
+                <div class="slide" style="background-image: url('../storage/resources/images/home/3.jpeg');"></div>
+                <div class="slide" style="background-image: url('../storage/resources/images/home/4.jpg');"></div>
+                <div class="slide" style="background-image: url('../storage/resources/images/home/5.jpg');"></div>
             </div>
             <div class="hero-overlay"></div>
             <div class="hero-pattern-1"></div>
             <div class="hero-pattern-2"></div>
             <div class="hero-content">
                 <div class="hero-icon">
-                    <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="logo-icon">
+                    <img src="../storage/resources/images/icon/icon.png" alt="DFAP" class="logo-icon">
                 </div>
                 <h1 class="hero-title">
                     Digital Fisheries & <br/>
@@ -277,7 +188,7 @@ if (isset($_POST['register'])) {
         <div class="auth-section">
             <div class="auth-container">
                 <div class="auth-header">
-                    <h2 class="auth-title">Welcome to DFAP</h2>
+                    <h2 class="auth-title">Welcome to Agrifish</h2>
                     <p class="auth-subtitle">Sign in with your email and password</p>
                 </div>
 
@@ -334,66 +245,66 @@ if (isset($_POST['register'])) {
                                     <label for="full_name" class="form-label">Full Name</label>
                                     <div class="input-wrapper">
                                         <input type="text" id="full_name" name="full_name" placeholder="Enter your full name"
-                                                class="form-input" value="<?php echo $full_name; ?>" required>
+                                                class="form-input" value="<?php echo $full_name; ?>">
                                         <span class="input-icon">👤</span>
                                     </div>
-                                    <span style="color:red"><?php echo $err_name; ?></span>
+                                    <span id="name_Err" class="error-span" style="color:red;"></span>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="phone_number" class="form-label">Phone Number</label>
                                     <div class="input-wrapper">
                                         <input type="text" id="phone_number" name="phone_number" placeholder="+880 1XXX-XXXXXX"
-                                                class="form-input" value="<?php echo $phone_number; ?>" required>
+                                                class="form-input" value="<?php echo $phone_number; ?>">
                                         <span class="input-icon">📱</span>
                                     </div>
-                                    <span style="color:red"><?php echo $err_phone; ?></span>
+                                    <span id="phone_Err" class="error-span" style="color:red;"></span>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="nid" class="form-label">National ID (NID)</label>
                                     <div class="input-wrapper">
                                         <input type="text" id="nid" name="nid" placeholder="Enter NID Number"
-                                                class="form-input" value="<?php echo $nid; ?>" required>
+                                                class="form-input" value="<?php echo $nid; ?>">
                                         <span class="input-icon">🆔</span>
                                     </div>
-                                    <span style="color:red"><?php echo $err_nid; ?></span>
+                                    <span id="nid_Err" class="error-span" style="color:red;"></span>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="reg_email" class="form-label">Email</label>
                                     <div class="input-wrapper">
                                         <input type="email" id="reg_email" name="reg_email" placeholder="user@example.com"
-                                                class="form-input" value="<?php echo $reg_email; ?>" required autocomplete="email">
+                                                class="form-input" value="<?php echo $reg_email; ?>" autocomplete="email">
                                         <span class="input-icon">📧</span>
                                     </div>
-                                    <span style="color:red"><?php echo $err_reg_email; ?></span>
+                                    <span id="email_Err" class="error-span" style="color:red;"></span>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="reg_password" class="form-label">Password</label>
                                     <div class="input-wrapper">
                                         <input type="password" id="reg_password" name="reg_password" placeholder="Enter password"
-                                                class="form-input" value="<?php echo $reg_password; ?>" required autocomplete="new-password">
+                                                class="form-input" value="<?php echo $reg_password; ?>" autocomplete="new-password">
                                         <span class="input-icon">🔒</span>
                                     </div>
-                                    <span style="color:red"><?php echo $err_reg_password; ?></span>
+                                    <span id="password_Err" class="error-span" style="color:red;"></span>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="confirm_password" class="form-label">Confirm Password</label>
                                     <div class="input-wrapper">
                                         <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password"
-                                                class="form-input" required>
+                                                class="form-input">
                                         <span class="input-icon">🔒</span>
                                     </div>
-                                    <span style="color:red"><?php echo $err_reg_confirm_password; ?></span>
+                                    <span id="confirm_password_Err" class="error-span" style="color:red;"></span>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="role" class="form-label">Role</label>
                                     <div class="input-wrapper">
-                                        <select id="role" name="role" class="form-input" required>
+                                        <select id="role" name="role" class="form-input">
                                             <option value="">Select your role</option>
                                             <option value="customer" <?php echo ($role == 'customer') ? 'selected' : ''; ?>>Customer</option>
                                             <option value="fisherman" <?php echo ($role == 'fisherman') ? 'selected' : ''; ?>>Fisherman</option>
@@ -401,7 +312,7 @@ if (isset($_POST['register'])) {
                                         </select>
                                         <span class="input-icon">👤</span>
                                     </div>
-                                    <span style="color:red"><?php echo $err_role; ?></span>
+                                    <span id="role_Err" class="error-span" style="color:red;"></span>
                                 </div>
 
                                 <button type="submit" class="auth-button" name="register" id="registerBtn">
@@ -422,18 +333,6 @@ if (isset($_POST['register'])) {
     </div>
 
 
-    <div id="signupModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Registration Submitted</h3>
-            </div>
-            <div class="modal-body">
-                <p><?php echo $_SESSION['signup_message'] ?? 'Please wait for admin verification.'; ?></p>
-                <p>You will be notified once your account is approved.</p>
-                <button onclick="closeSignupModal()" class="btn-primary" style="margin-top: 1rem;">OK</button>
-            </div>
-        </div>
-    </div>
 
 
     <div id="demoModal" class="modal" style="display: none;">
@@ -463,8 +362,22 @@ if (isset($_POST['register'])) {
         </div>
     </div>
 
-    <script>
 
+    <div id="signupModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registration Submitted</h3>
+            </div>
+            <div class="modal-body">
+                <p><?php echo $_SESSION['signup_message'] ?? 'Please wait for admin verification.'; ?></p>
+                <p>You will be notified once your account is approved.</p>
+                <button onclick="closeSignupModal()" class="btn-primary" style="margin-top: 1rem;">OK</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
  
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             const email = document.getElementById('email').value;
@@ -479,6 +392,35 @@ if (isset($_POST['register'])) {
 
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = 'Logging in... <span class="spinner">⟳</span>';
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const btn = document.getElementById('registerBtn');
+            btn.innerHTML = 'Signing up... <span class="spinner">⟳</span>';
+            fetch('ajax_register.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelectorAll('.error-span').forEach(span => span.textContent = '');
+                if (data.success) {
+                    document.getElementById('signupModal').style.display = 'block';
+                    this.reset();
+                } else if (data.errors) {
+                    for (const [key, value] of Object.entries(data.errors)) {
+                        const span = document.getElementById(key);
+                        if (span) span.textContent = value;
+                    }
+                }
+                btn.innerHTML = 'Sign Up <span class="arrow-icon">→</span>';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                btn.innerHTML = 'Sign Up <span class="arrow-icon">→</span>';
+            });
         });
 
 

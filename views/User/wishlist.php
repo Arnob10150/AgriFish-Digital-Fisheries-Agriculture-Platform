@@ -40,7 +40,7 @@ foreach ($allProducts as $product) {
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="/DFAP/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
+                <img src="/AgriFish-Digital-Fisheries-Agriculture-Platform-main/storage/resources/images/icon/icon.png" alt="DFAP" class="sidebar-icon"> DFAP
             </div>
             <div class="sidebar-subtitle">Buyer Portal</div>
         </div>
@@ -81,11 +81,16 @@ foreach ($allProducts as $product) {
                 ?>
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="<?php echo htmlspecialchars($product['image']); ?>"
-                             alt="<?php echo htmlspecialchars($product['name']); ?>"
-                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo $product['image'] ?? '🐟'; ?></div>
+                        <?php $image = $product['image'] ?? '🐟'; ?>
+                        <?php if (filter_var($image, FILTER_VALIDATE_URL) || strpos($image, '/') === 0): ?>
+                            <img src="<?php echo htmlspecialchars($image); ?>"
+                                 alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div style="display: none; font-size: 3rem; text-align: center; line-height: 1;"><?php echo htmlspecialchars($image); ?></div>
+                        <?php else: ?>
+                            <div style="font-size: 3rem; text-align: center; line-height: 1;"><?php echo htmlspecialchars($image); ?></div>
+                        <?php endif; ?>
                     </div>
                     <div class="product-content">
                         <div class="product-header">
